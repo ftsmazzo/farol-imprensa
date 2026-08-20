@@ -16,9 +16,8 @@ Ver [docs/SPRINTS.md](docs/SPRINTS.md) — 5 sprints curtos.
 | 1 | Fundação | feito |
 | 2 | Ingestão PE | feito |
 | 3 | Digest | feito |
-| 4 | Temas | próximo |
-| 4 | Temas | — |
-| 5 | Alertas | — |
+| 4 | Temas | feito |
+| 5 | Alertas | feito |
 
 ## Produção (Easypanel)
 
@@ -27,7 +26,17 @@ Ver [docs/SPRINTS.md](docs/SPRINTS.md) — 5 sprints curtos.
 - **URL:** https://farol-imprensa-web.kxryyk.easypanel.host
 - **Repo:** https://github.com/ftsmazzo/farol-imprensa
 
-Health: `/api/health` · Meta: `/api/meta` · Digest: `/api/digest?uf=PE`
+Health: `/api/health` · Meta: `/api/meta` · Digest: `/api/digest?uf=PE` · Alertas: `/api/alerts/rules`
+
+### Env alertas (Sprint 5)
+
+```
+N8N_ALERT_WEBHOOK=https://pazotti-n8n.kxryyk.easypanel.host/webhook/farol-alerta
+ALERT_WHATSAPP_TO=5581XXXXXXXXX
+ALERT_EVOLUTION_INSTANCE=nome-da-instancia
+```
+
+n8n: workflow **Farol — Alertas WhatsApp** (`jekJRVnX4nv02vZX`)
 
 ## Local (Sprint 1)
 

@@ -5,7 +5,28 @@ type Meta = {
   sprint?: number;
   sources?: number;
   articles?: number;
+  alertRules?: number;
+  alertWebhookConfigured?: boolean;
   lastFetchAt?: string | null;
+};
+
+type AlertRule = {
+  id: number;
+  name: string;
+  keywords: string[];
+  uf: string | null;
+  active: boolean;
+};
+
+type AlertEvent = {
+  id: number;
+  ruleName: string;
+  matchedOn: string;
+  status: string;
+  title: string;
+  url: string;
+  source: string | null;
+  createdAt: string;
 };
 
 type DigestItem = {
@@ -80,8 +101,21 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
+  const [rules, setRules] = useState<AlertRule[]>([]);
+  const [events, setEvents] = useState<AlertEvent[]>([]);
+  const [ruleName, setRuleName] = useState("");
+  const [ruleKeywords, setRuleKeywords] = useState("");
 
   const loadMeta = () => fetch("/api/meta").then((r) => r.json()).then(setMeta);
+
+  const loadAlerts = async () => {
+    const [r, e] = await Promise.all([
+      fetch("/api/alerts/rules").then((x) => x.json()),
+      fetch("/api/alerts/events?limit=12").then((x) => x.json()),
+    ]);
+    setRules(Array.isArray(r) ? r.filter((x: AlertRule) => x.active) : []);
+    setEvents(Array.isArray(e) ? e : []);
+  };
 
   const digestUrl = (date: string, themeVal: string, query: string) => {
     const params = new URLSearchParams({ uf: "PE", date });
@@ -109,7 +143,11 @@ export default function App() {
   };
 
   useEffect(() => {
-    Promise.all([loadMeta(), fetch("/api/digest?uf=PE").then((r) => r.json())])
+    Promise.all([
+      loadMeta(),
+      fetch("/api/digest?uf=PE").then((r) => r.json()),
+      loadAlerts(),
+    ])
       .then(async ([, base]) => {
         if (base.today && base.yesterday) {
           setAnchors({ today: base.today, yesterday: base.yesterday });
@@ -163,10 +201,77 @@ export default function App() {
       });
       const j = await r.json();
       if (!r.ok) throw new Error(j.error || r.statusText);
-      setFlash(`Coleta: ${j.inserted} novas · ${j.skipped} já existiam · ${j.errors} erros`);
+      setFlash(`Coleta: ${j.inserted} novas · ${j.skipped} já existiam · ${j.errors} erros${j.alerts ? ` · ${j.alerts} alertas` : ""}`);
       await selectDay(day);
+      await loadAlerts();
     } catch (e) {
       setError(String(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const createRule = async (e: FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    try {
+      const r = await fetch("/api/alerts/rules", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          name: ruleName.trim(),
+          keywords: ruleKeywords,
+          uf: "PE",
+        }),
+      });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error || r.statusText);
+      setRuleName("");
+      setRuleKeywords("");
+      setFlash(`Regra criada: ${j.name}`);
+      await loadAlerts();
+      await loadMeta();
+    } catch (err) {
+      setError(String(err));
+    }
+  };
+
+  const rematchAlerts = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      const r = await fetch("/api/alerts/rematch", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ limit: 200 }),
+      });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error || r.statusText);
+      setFlash(`Rematch: ${j.matched} novos eventos em ${j.scanned} artigos`);
+      await loadAlerts();
+    } catch (err) {
+      setError(String(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const testAlert = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      const r = await fetch("/api/alerts/test", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ matchedOn: "teste" }),
+      });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error || r.statusText);
+      const st = j.dispatch?.status || j.dispatch?.queued ? "queued" : j.dispatch?.error || "ok";
+      setFlash(`Teste alerta #${j.eventId}: ${st}`);
+      await loadAlerts();
+    } catch (err) {
+      setError(String(err));
     } finally {
       setBusy(false);
     }
@@ -198,8 +303,12 @@ export default function App() {
             <strong>{meta?.articles ?? 0}</strong>
           </div>
           <div className="kpi">
+            <span>Alertas</span>
+            <strong>{meta?.alertRules ?? rules.length}</strong>
+          </div>
+          <div className="kpi">
             <span>Sprint</span>
-            <strong>{meta?.sprint ?? 4}</strong>
+            <strong>{meta?.sprint ?? 5}</strong>
           </div>
         </div>
       </header>
@@ -305,8 +414,75 @@ export default function App() {
         )}
       </section>
 
+      <section className="alerts" aria-label="Alertas">
+        <div className="alerts-head">
+          <div>
+            <h2>Alertas</h2>
+            <p>
+              {meta?.alertWebhookConfigured
+                ? "Webhook n8n configurado — disparo ativo na coleta."
+                : "Defina N8N_ALERT_WEBHOOK no Easypanel para disparar no WhatsApp/n8n."}
+            </p>
+          </div>
+          <div className="actions">
+            <button type="button" className="btn ghost" onClick={rematchAlerts} disabled={busy}>
+              Rematch
+            </button>
+            <button type="button" className="btn ghost" onClick={testAlert} disabled={busy}>
+              Testar disparo
+            </button>
+          </div>
+        </div>
+
+        <form className="rule-form" onSubmit={createRule}>
+          <input
+            type="text"
+            placeholder="Nome da regra"
+            value={ruleName}
+            onChange={(e) => setRuleName(e.target.value)}
+            required
+          />
+          <input
+            type="text"
+            placeholder="Keywords (vírgula)"
+            value={ruleKeywords}
+            onChange={(e) => setRuleKeywords(e.target.value)}
+            required
+          />
+          <button type="submit" className="btn">
+            Criar regra
+          </button>
+        </form>
+
+        {rules.length > 0 && (
+          <div className="source-strip">
+            {rules.map((r) => (
+              <span key={r.id} className="chip">
+                {r.name} <b>{(r.keywords || []).join(", ")}</b>
+              </span>
+            ))}
+          </div>
+        )}
+
+        {events.length > 0 && (
+          <ul className="event-list">
+            {events.map((ev) => (
+              <li key={ev.id}>
+                <span className={`st ${ev.status}`}>{ev.status}</span>
+                <a href={ev.url} target="_blank" rel="noreferrer">
+                  {ev.title}
+                </a>
+                <span className="vehicle">
+                  {ev.ruleName} · “{ev.matchedOn}” · {ev.source || "Fonte"}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
       <footer className="foot">
-        Farol · Sprint {meta?.sprint ?? 4} · paralelo ao Radar Imprensa
+        Farol · Sprint {meta?.sprint ?? 5} · paralelo ao Radar Imprensa
       </footer>
     </div>
   );

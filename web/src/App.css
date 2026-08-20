@@ -321,6 +321,99 @@ body {
   font-size: 0.85rem;
 }
 
+.alerts {
+  margin-top: 1.75rem;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  padding: 1.15rem 1.25rem 1.35rem;
+}
+
+.alerts-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  justify-content: space-between;
+  align-items: end;
+  margin-bottom: 0.9rem;
+}
+
+.alerts h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  font-weight: 400;
+  color: var(--beam);
+}
+
+.alerts-head p {
+  margin: 0.3rem 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  max-width: 34rem;
+}
+
+.rule-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.rule-form input {
+  flex: 1;
+  min-width: 10rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--line);
+  background: rgba(11, 18, 32, 0.55);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+.event-list {
+  list-style: none;
+  margin: 0.85rem 0 0;
+  padding: 0;
+}
+
+.event-list li {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr;
+  gap: 0.35rem 0.75rem;
+  padding: 0.65rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.event-list a {
+  color: var(--ink);
+  text-decoration: none;
+  grid-column: 2;
+}
+
+.event-list .vehicle {
+  grid-column: 2;
+}
+
+.st {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  padding-top: 0.2rem;
+}
+
+.st.sent {
+  color: #6dcf9b;
+}
+
+.st.pending,
+.st.queued {
+  color: var(--beam);
+}
+
+.st.error {
+  color: #f6c;
+}
+
 @media (max-width: 640px) {
   .top {
     align-items: start;

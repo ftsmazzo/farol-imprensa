@@ -4,6 +4,13 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import pg from "pg";
 import { cleanTitle } from "./cleanTitle.js";
+import {
+  dispatchAlertEvent,
+  dispatchPendingAlerts,
+  matchArticleAlerts,
+  normalizeKeywords,
+  N8N_ALERT_WEBHOOK,
+} from "./alerts.js";
 import { runIngest } from "./ingest.js";
 import { seedSources } from "./seed.js";
 import { THEMES, classifyTheme } from "./themes.js";
@@ -16,7 +23,9 @@ const { Pool } = pg;
 const PORT = Number(process.env.PORT || 3100);
 const DATABASE_URL = process.env.DATABASE_URL || "";
 const INGEST_TOKEN = process.env.INGEST_TOKEN || "";
-const SPRINT = 4;
+const ALERT_WHATSAPP_TO = process.env.ALERT_WHATSAPP_TO || "";
+const ALERT_EVOLUTION_INSTANCE = process.env.ALERT_EVOLUTION_INSTANCE || "";
+const SPRINT = 5;
 
 const pool = DATABASE_URL
   ? new Pool({
@@ -100,6 +109,8 @@ async function migrate() {
       sent_at TIMESTAMPTZ,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
+    CREATE UNIQUE INDEX IF NOT EXISTS alert_events_rule_article_uidx
+      ON alert_events (rule_id, article_id);
   `);
   console.log("Migrate ok");
 }
@@ -155,6 +166,18 @@ async function backfillArticles() {
     fixed += 1;
   }
   if (fixed) console.log(`Backfill: ${fixed} artigos (título/tema)`);
+}
+
+async function seedDefaultAlertRule() {
+  if (!pool) return;
+  const { rows } = await pool.query(`SELECT COUNT(*)::int AS n FROM alert_rules`);
+  if (rows[0].n > 0) return;
+  await pool.query(
+    `INSERT INTO alert_rules (name, keywords, uf, theme, channel, active)
+     VALUES ($1, $2, $3, NULL, 'webhook', TRUE)`,
+    ["Piloto PE — Cabrobó", ["cabrobó", "cabrobo"], "PE"]
+  );
+  console.log("Seed: regra piloto Cabrobó");
 }
 
 const app = express();
@@ -216,9 +239,10 @@ app.get("/api/meta", async (_req, res) => {
       lastArticleAt: r.last_article_at,
       lastFetchAt: r.last_fetch_at,
       ingestRunning,
+      alertWebhookConfigured: Boolean(N8N_ALERT_WEBHOOK),
       note:
         r.articles > 0
-          ? "Ingestão ativa (Sprint 2). Use Coletar no painel ou POST /api/ingest/run."
+          ? "Sprint 5: alertas ativos. Configure N8N_ALERT_WEBHOOK para disparo."
           : "Fontes PE seedadas. Rode a coleta para popular o digest.",
     });
   } catch (err) {
@@ -269,6 +293,225 @@ app.post("/api/ingest/run", async (req, res) => {
     res.status(500).json({ error: String(err.message || err) });
   } finally {
     ingestRunning = false;
+  }
+});
+
+function mapRule(r) {
+  return {
+    id: r.id,
+    name: r.name,
+    keywords: r.keywords || [],
+    uf: r.uf,
+    theme: r.theme,
+    channel: r.channel,
+    active: r.active,
+    createdAt: r.created_at,
+  };
+}
+
+app.get("/api/alerts/rules", async (_req, res) => {
+  if (!pool) return res.json([]);
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, name, keywords, uf, theme, channel, active, created_at
+       FROM alert_rules ORDER BY id DESC`
+    );
+    res.json(rows.map(mapRule));
+  } catch (err) {
+    res.status(500).json({ error: String(err.message || err) });
+  }
+});
+
+app.post("/api/alerts/rules", async (req, res) => {
+  if (!pool) return res.status(503).json({ error: "DATABASE_URL não configurado" });
+  const name = String(req.body?.name || "").trim();
+  const keywords = normalizeKeywords(req.body?.keywords);
+  const uf = req.body?.uf ? String(req.body.uf).toUpperCase().slice(0, 2) : null;
+  const theme = req.body?.theme ? String(req.body.theme).trim() : null;
+  const channel = String(req.body?.channel || "webhook").trim() || "webhook";
+  if (!name || !keywords.length) {
+    return res.status(400).json({ error: "name e keywords são obrigatórios" });
+  }
+  try {
+    const { rows } = await pool.query(
+      `INSERT INTO alert_rules (name, keywords, uf, theme, channel, active)
+       VALUES ($1, $2, $3, $4, $5, TRUE)
+       RETURNING id, name, keywords, uf, theme, channel, active, created_at`,
+      [name, keywords, uf, theme, channel]
+    );
+    res.status(201).json(mapRule(rows[0]));
+  } catch (err) {
+    res.status(500).json({ error: String(err.message || err) });
+  }
+});
+
+app.patch("/api/alerts/rules/:id", async (req, res) => {
+  if (!pool) return res.status(503).json({ error: "DATABASE_URL não configurado" });
+  const id = Number(req.params.id);
+  if (!Number.isFinite(id)) return res.status(400).json({ error: "id inválido" });
+  const fields = [];
+  const params = [];
+  const set = (col, val) => {
+    params.push(val);
+    fields.push(`${col} = $${params.length}`);
+  };
+  if (req.body?.name != null) set("name", String(req.body.name).trim());
+  if (req.body?.keywords != null) set("keywords", normalizeKeywords(req.body.keywords));
+  if (req.body?.uf !== undefined) {
+    set("uf", req.body.uf ? String(req.body.uf).toUpperCase().slice(0, 2) : null);
+  }
+  if (req.body?.theme !== undefined) {
+    set("theme", req.body.theme ? String(req.body.theme).trim() : null);
+  }
+  if (req.body?.channel != null) set("channel", String(req.body.channel).trim());
+  if (req.body?.active != null) set("active", Boolean(req.body.active));
+  if (!fields.length) return res.status(400).json({ error: "nada para atualizar" });
+  params.push(id);
+  try {
+    const { rows } = await pool.query(
+      `UPDATE alert_rules SET ${fields.join(", ")} WHERE id = $${params.length}
+       RETURNING id, name, keywords, uf, theme, channel, active, created_at`,
+      params
+    );
+    if (!rows.length) return res.status(404).json({ error: "regra não encontrada" });
+    res.json(mapRule(rows[0]));
+  } catch (err) {
+    res.status(500).json({ error: String(err.message || err) });
+  }
+});
+
+app.delete("/api/alerts/rules/:id", async (req, res) => {
+  if (!pool) return res.status(503).json({ error: "DATABASE_URL não configurado" });
+  const id = Number(req.params.id);
+  try {
+    await pool.query(`UPDATE alert_rules SET active = FALSE WHERE id = $1`, [id]);
+    res.json({ ok: true, id, active: false });
+  } catch (err) {
+    res.status(500).json({ error: String(err.message || err) });
+  }
+});
+
+app.get("/api/alerts/events", async (req, res) => {
+  if (!pool) return res.json([]);
+  const limit = Math.min(Number(req.query.limit) || 40, 100);
+  try {
+    const { rows } = await pool.query(
+      `SELECT e.id, e.matched_on, e.status, e.created_at, e.sent_at,
+              r.name AS rule_name, a.title, a.url, s.name AS source_name
+       FROM alert_events e
+       JOIN alert_rules r ON r.id = e.rule_id
+       JOIN articles a ON a.id = e.article_id
+       LEFT JOIN sources s ON s.id = a.source_id
+       ORDER BY e.created_at DESC
+       LIMIT $1`,
+      [limit]
+    );
+    res.json(
+      rows.map((r) => ({
+        id: r.id,
+        ruleName: r.rule_name,
+        matchedOn: r.matched_on,
+        status: r.status,
+        title: r.title,
+        url: r.url,
+        source: r.source_name,
+        createdAt: r.created_at,
+        sentAt: r.sent_at,
+      }))
+    );
+  } catch (err) {
+    res.status(500).json({ error: String(err.message || err) });
+  }
+});
+
+app.post("/api/alerts/dispatch", async (req, res) => {
+  if (!pool) return res.status(503).json({ error: "DATABASE_URL não configurado" });
+  if (!requireIngestAuth(req, res)) return;
+  try {
+    const report = await dispatchPendingAlerts(pool, {
+      limit: Math.min(Number(req.body?.limit) || 30, 100),
+    });
+    res.json(report);
+  } catch (err) {
+    res.status(500).json({ error: String(err.message || err) });
+  }
+});
+
+/** Simula alerta: cria evento a partir de artigo existente (ou o mais recente) e dispara. */
+app.post("/api/alerts/test", async (req, res) => {
+  if (!pool) return res.status(503).json({ error: "DATABASE_URL não configurado" });
+  if (!requireIngestAuth(req, res)) return;
+  try {
+    let ruleId = req.body?.ruleId ? Number(req.body.ruleId) : null;
+    if (!ruleId) {
+      const rules = await pool.query(
+        `SELECT id FROM alert_rules WHERE active = TRUE ORDER BY id ASC LIMIT 1`
+      );
+      if (!rules.rowCount) return res.status(400).json({ error: "crie uma regra primeiro" });
+      ruleId = rules.rows[0].id;
+    }
+    let articleId = req.body?.articleId ? Number(req.body.articleId) : null;
+    if (!articleId) {
+      const arts = await pool.query(
+        `SELECT id, title, summary, theme, uf FROM articles ORDER BY fetched_at DESC LIMIT 1`
+      );
+      if (!arts.rowCount) return res.status(400).json({ error: "sem artigos na base" });
+      articleId = arts.rows[0].id;
+    }
+    const art = await pool.query(
+      `SELECT id, title, summary, theme, uf FROM articles WHERE id = $1`,
+      [articleId]
+    );
+    if (!art.rowCount) return res.status(404).json({ error: "artigo não encontrado" });
+
+    // força match registrando evento pending
+    const keyword = String(req.body?.matchedOn || "teste").slice(0, 80);
+    const ev = await pool.query(
+      `INSERT INTO alert_events (rule_id, article_id, matched_on, status)
+       VALUES ($1, $2, $3, 'pending')
+       ON CONFLICT (rule_id, article_id) DO UPDATE
+         SET status = 'pending', matched_on = EXCLUDED.matched_on, sent_at = NULL
+       RETURNING id`,
+      [ruleId, articleId, keyword]
+    );
+    const dispatch = await dispatchAlertEvent(pool, ev.rows[0].id);
+    res.json({
+      ok: true,
+      eventId: ev.rows[0].id,
+      articleId,
+      ruleId,
+      dispatch,
+      extras: {
+        whatsappTo: ALERT_WHATSAPP_TO || null,
+        evolutionInstance: ALERT_EVOLUTION_INSTANCE || null,
+        webhookConfigured: Boolean(N8N_ALERT_WEBHOOK),
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ error: String(err.message || err) });
+  }
+});
+
+/** Rematch artigos recentes contra regras (útil após criar regra). */
+app.post("/api/alerts/rematch", async (req, res) => {
+  if (!pool) return res.status(503).json({ error: "DATABASE_URL não configurado" });
+  if (!requireIngestAuth(req, res)) return;
+  const limit = Math.min(Number(req.body?.limit) || 200, 500);
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, title, summary, theme, uf FROM articles
+       ORDER BY fetched_at DESC LIMIT $1`,
+      [limit]
+    );
+    let matched = 0;
+    for (const a of rows) {
+      const r = await matchArticleAlerts(pool, a);
+      matched += r.matched;
+    }
+    const dispatch = matched ? await dispatchPendingAlerts(pool) : null;
+    res.json({ ok: true, scanned: rows.length, matched, dispatch });
+  } catch (err) {
+    res.status(500).json({ error: String(err.message || err) });
   }
 });
 
@@ -408,6 +651,7 @@ if (pool) {
     await migrate();
     await seedSources(pool, root);
     await backfillArticles();
+    await seedDefaultAlertRule();
   } catch (err) {
     console.warn("Postgres indisponível no boot:", err.message || err);
   }

@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import { matchArticleAlerts, dispatchPendingAlerts } from "./alerts.js";
 import { cleanTitle } from "./cleanTitle.js";
 import { classifyTheme } from "./themes.js";
 
@@ -89,8 +90,11 @@ export async function ingestSource(pool, source) {
     const items = parseFeed(xml).slice(0, 40);
     let inserted = 0;
     let skipped = 0;
+    let alerts = 0;
     for (const item of items) {
       const urlHash = hashUrl(item.url);
+      const title = cleanTitle(item.title, source.name);
+      const theme = item.theme || classifyTheme(item.title, item.summary);
       const result = await pool.query(
         `INSERT INTO articles (source_id, url, url_hash, title, summary, published_at, uf, theme, raw)
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9::jsonb)
@@ -100,19 +104,29 @@ export async function ingestSource(pool, source) {
           source.id,
           item.url,
           urlHash,
-          cleanTitle(item.title, source.name),
+          title,
           item.summary,
           item.publishedAt,
           source.uf,
-          item.theme || classifyTheme(item.title, item.summary),
+          theme,
           JSON.stringify({ ingest: "rss", at: new Date().toISOString() }),
         ]
       );
-      if (result.rowCount) inserted += 1;
-      else skipped += 1;
+      if (result.rowCount) {
+        inserted += 1;
+        const article = {
+          id: result.rows[0].id,
+          title,
+          summary: item.summary,
+          theme,
+          uf: source.uf,
+        };
+        const match = await matchArticleAlerts(pool, article);
+        alerts += match.matched;
+      } else skipped += 1;
     }
     await pool.query(`UPDATE sources SET last_fetched_at = NOW() WHERE id = $1`, [source.id]);
-    return { sourceId: source.id, name: source.name, fetched: items.length, inserted, skipped };
+    return { sourceId: source.id, name: source.name, fetched: items.length, inserted, skipped, alerts };
   } catch (err) {
     return {
       sourceId: source.id,
@@ -142,12 +156,19 @@ export async function runIngest(pool, { uf = "PE", limitSources = 50 } = {}) {
   let inserted = 0;
   let skipped = 0;
   let errors = 0;
+  let alerts = 0;
   for (const source of rows) {
     const r = await ingestSource(pool, source);
     results.push(r);
     inserted += r.inserted || 0;
     skipped += r.skipped || 0;
+    alerts += r.alerts || 0;
     if (r.error) errors += 1;
+  }
+
+  let dispatch = null;
+  if (alerts > 0) {
+    dispatch = await dispatchPendingAlerts(pool);
   }
 
   return {
@@ -157,6 +178,8 @@ export async function runIngest(pool, { uf = "PE", limitSources = 50 } = {}) {
     inserted,
     skipped,
     errors,
+    alerts,
+    dispatch,
     results,
     finishedAt: new Date().toISOString(),
   };

@@ -90,13 +90,19 @@ Depois do 5 = MVP utilizável. Escala UF/Brasil só após calibrar PE.
 **Objetivo:** saber quando sai notícia sobre X.
 
 **Entregáveis**
-- CRUD mínimo de regras (nome/keyword/UF)
-- Match na ingestão → fila `alert_events`
-- Webhook n8n (WhatsApp **ou** e-mail)
+- [x] CRUD mínimo de regras (nome/keyword/UF)
+- [x] Match na ingestão → fila `alert_events`
+- [x] Webhook n8n (+ WhatsApp Evolution opcional)
+- [x] Painel: criar regra, rematch, testar disparo, lista de eventos
 
 **DoD:** publicar/simular matéria com keyword → notificação em &lt; 30 min (ou imediato no job).
 
 **Fora:** app mobile, 10 canais, ML de relevância.
+
+**Env (Easypanel `web`)**
+- `N8N_ALERT_WEBHOOK` — URL de produção do webhook n8n
+- `ALERT_WHATSAPP_TO` — opcional (ex.: `5581999999999`)
+- `ALERT_EVOLUTION_INSTANCE` — opcional (nome da instância Evolution)
 
 ---
 
