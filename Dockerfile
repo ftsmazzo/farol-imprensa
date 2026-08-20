@@ -20,6 +20,7 @@ ENV PORT=3000
 COPY --from=server-deps /app/server/node_modules ./server/node_modules
 COPY server/package.json ./server/package.json
 COPY server/src ./server/src
+COPY data ./data
 COPY --from=web-build /app/web/dist ./public
 
 WORKDIR /app/server

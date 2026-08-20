@@ -1,0 +1,127 @@
+{
+  "version": "sources-pe-v1",
+  "uf": "PE",
+  "note": "Top editorial PE do Radar + RSS diretos quando existem; demais via Google News site:",
+  "items": [
+    {
+      "id": "pe-g1",
+      "name": "G1 PE",
+      "uf": "PE",
+      "city": "Recife",
+      "type": "Portal",
+      "website": "https://g1.globo.com/pe/pernambuco/",
+      "rssUrl": "https://g1.globo.com/dynamo/pe/pernambuco/rss2.xml",
+      "radarVehicleId": "atlas-11902"
+    },
+    {
+      "id": "pe-marco-zero",
+      "name": "Marco Zero Conteúdo",
+      "uf": "PE",
+      "city": "Recife",
+      "type": "Portal",
+      "website": "http://marcozero.org/",
+      "rssUrl": "https://marcozero.org/feed/",
+      "radarVehicleId": "atlas-11967"
+    },
+    {
+      "id": "pe-ne10",
+      "name": "NE10 (JC Online)",
+      "uf": "PE",
+      "city": "Recife",
+      "type": "Portal",
+      "website": "https://ne10.uol.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:ne10.uol.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-1427"
+    },
+    {
+      "id": "pe-diario",
+      "name": "Diário de Pernambuco",
+      "uf": "PE",
+      "city": "Recife",
+      "type": "Jornal",
+      "website": "https://www.diariodepernambuco.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:diariodepernambuco.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-1439"
+    },
+    {
+      "id": "pe-folhape",
+      "name": "Folha de Pernambuco",
+      "uf": "PE",
+      "city": "Recife",
+      "type": "Jornal",
+      "website": "https://www.folhape.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:folhape.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-11664"
+    },
+    {
+      "id": "pe-leiaja",
+      "name": "LeiaJá",
+      "uf": "PE",
+      "city": "Recife",
+      "type": "Portal",
+      "website": "http://www.leiaja.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:leiaja.com+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-12026"
+    },
+    {
+      "id": "pe-cbn",
+      "name": "CBN Recife",
+      "uf": "PE",
+      "city": "Recife",
+      "type": "Rádio",
+      "website": "http://www.cbnrecife.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:cbnrecife.com+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-12164"
+    },
+    {
+      "id": "pe-ne45",
+      "name": "NE45",
+      "uf": "PE",
+      "city": "Recife",
+      "type": "Blog",
+      "website": "https://ne45.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:ne45.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-14743"
+    },
+    {
+      "id": "pe-didigalvao",
+      "name": "Blog do Didi Galvão",
+      "uf": "PE",
+      "city": "Recife",
+      "type": "Blog",
+      "website": "https://www.didigalvao.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:didigalvao.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-17426"
+    },
+    {
+      "id": "pe-carlosbritto",
+      "name": "Blog do Carlos Britto",
+      "uf": "PE",
+      "city": "Recife",
+      "type": "Blog",
+      "website": "http://www.carlosbritto.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:carlosbritto.com+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-1420"
+    },
+    {
+      "id": "pe-movimento",
+      "name": "Movimento Econômico",
+      "uf": "PE",
+      "city": "Recife",
+      "type": "Blog",
+      "website": "https://movimentoeconomico.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:movimentoeconomico.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-16482"
+    },
+    {
+      "id": "pe-gnews",
+      "name": "Google News · Pernambuco",
+      "uf": "PE",
+      "city": null,
+      "type": "Agregador",
+      "website": "https://news.google.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=Pernambuco+when:1d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    }
+  ]
+}

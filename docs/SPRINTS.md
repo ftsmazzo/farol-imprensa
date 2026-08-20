@@ -42,9 +42,10 @@ Depois do 5 = MVP utilizável. Escala UF/Brasil só após calibrar PE.
 **Objetivo:** notícias novas aparecem no Postgres sem UI sofisticada.
 
 **Entregáveis**
-- Seed de `sources` (PE: Top editorial/quantitativo do Radar + RSS quando houver)
-- Job `POST /api/ingest/run` (RSS parse + dedup por URL)
-- Log de última coleta em `/api/meta`
+- [x] Seed de `sources` (PE: Top Radar + RSS / Google News)
+- [x] Job `POST /api/ingest/run` (RSS parse + dedup por URL)
+- [x] Log de última coleta em `/api/meta`
+- [x] Botão **Coletar agora** no painel
 
 **DoD:** rodar ingest 2× e ver `articles` crescer sem duplicar URL.
 

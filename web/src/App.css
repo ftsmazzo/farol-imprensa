@@ -94,6 +94,14 @@ body {
   font-size: 1.15rem;
 }
 
+.hero-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: end;
+}
+
 .hero-line h1 {
   margin: 0;
   font-family: var(--font-display);
@@ -105,6 +113,22 @@ body {
   margin: 0.45rem 0 0;
   color: var(--muted);
   max-width: 36rem;
+}
+
+.btn {
+  border: 0;
+  cursor: pointer;
+  padding: 0.7rem 1.1rem;
+  background: var(--beam);
+  color: #1a1408;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
 
 .note,

@@ -13,9 +13,9 @@ Ver [docs/SPRINTS.md](docs/SPRINTS.md) — 5 sprints curtos.
 
 | # | Nome | Status |
 |---|------|--------|
-| 1 | Fundação | em curso |
-| 2 | Ingestão PE | próximo |
-| 3 | Digest | — |
+| 1 | Fundação | feito |
+| 2 | Ingestão PE | feito |
+| 3 | Digest | próximo |
 | 4 | Temas | — |
 | 5 | Alertas | — |
 
