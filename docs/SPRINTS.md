@@ -58,9 +58,10 @@ Depois do 5 = MVP utilizável. Escala UF/Brasil só após calibrar PE.
 **Objetivo:** operador vê o dia em &lt; 10s.
 
 **Entregáveis**
-- `GET /api/digest?uf=PE&date=YYYY-MM-DD`
-- Lista no painel: hora, título, veículo, link
-- Contador do dia + “última coleta”
+- [x] `GET /api/digest?uf=PE&date=` com contagem, label e por fonte
+- [x] Lista: hora · título · veículo · link
+- [x] Contador do dia + Hoje/Ontem + última coleta
+- [x] Fallback automático (hoje → ontem → recentes)
 
 **DoD:** abrir painel e enxergar matérias de hoje (ou ontem se vazio).
 

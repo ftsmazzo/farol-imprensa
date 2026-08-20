@@ -131,6 +131,87 @@ body {
   cursor: wait;
 }
 
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.day-tabs {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.tab {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  padding: 0.55rem 0.85rem;
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+.tab.on {
+  background: rgba(240, 180, 41, 0.15);
+  color: var(--beam);
+  border-color: rgba(240, 180, 41, 0.45);
+}
+
+.source-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 1rem 0 0;
+}
+
+.chip {
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.chip b {
+  color: var(--ink);
+  margin-left: 0.25rem;
+}
+
+.feed .row {
+  display: grid;
+  grid-template-columns: 3.4rem 1fr;
+  gap: 0.85rem;
+  align-items: start;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.feed time {
+  font-variant-numeric: tabular-nums;
+  color: var(--beam);
+  font-size: 0.92rem;
+  padding-top: 0.15rem;
+}
+
+.row-body a {
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+
+.row-body a:hover {
+  color: var(--beam);
+}
+
+.vehicle {
+  display: inline-block;
+  margin-top: 0.35rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
 .note,
 .err {
   margin: 1rem 0 0;
@@ -176,28 +257,6 @@ body {
   list-style: none;
   margin: 0;
   padding: 0;
-}
-
-.feed li {
-  padding: 0.85rem 0;
-  border-bottom: 1px solid var(--line);
-}
-
-.feed a {
-  color: var(--ink);
-  text-decoration: none;
-  font-size: 1.05rem;
-}
-
-.feed a:hover {
-  color: var(--beam);
-}
-
-.feed span {
-  display: block;
-  margin-top: 0.25rem;
-  color: var(--muted);
-  font-size: 0.85rem;
 }
 
 .foot {

@@ -14,7 +14,7 @@ const { Pool } = pg;
 const PORT = Number(process.env.PORT || 3100);
 const DATABASE_URL = process.env.DATABASE_URL || "";
 const INGEST_TOKEN = process.env.INGEST_TOKEN || "";
-const SPRINT = 2;
+const SPRINT = 3;
 
 const pool = DATABASE_URL
   ? new Pool({
@@ -24,6 +24,23 @@ const pool = DATABASE_URL
   : null;
 
 let ingestRunning = false;
+
+/** YYYY-MM-DD no fuso de Brasília. */
+export function dateInBrasilia(d = new Date()) {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Sao_Paulo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(d);
+}
+
+function shiftDateISO(isoDate, days) {
+  const [y, m, d] = isoDate.split("-").map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d));
+  dt.setUTCDate(dt.getUTCDate() + days);
+  return dt.toISOString().slice(0, 10);
+}
 
 async function migrate() {
   if (!pool) return;
@@ -228,60 +245,81 @@ app.post("/api/ingest/run", async (req, res) => {
 
 app.get("/api/digest", async (req, res) => {
   const uf = String(req.query.uf || "PE").toUpperCase();
-  const date = String(req.query.date || new Date().toISOString().slice(0, 10));
-  const recent = req.query.recent === "1" || req.query.recent === "true";
+  const todayBr = dateInBrasilia();
+  const yesterdayBr = shiftDateISO(todayBr, -1);
+  let date = String(req.query.date || todayBr);
+  let mode = "day"; // day | yesterday-fallback | recent
   if (!pool) {
-    return res.json({ uf, date, items: [], note: "Sem banco" });
+    return res.json({ uf, date, today: todayBr, count: 0, items: [], bySource: [], note: "Sem banco" });
   }
   try {
-    let rows;
-    if (recent) {
-      const r = await pool.query(
+    const queryDay = async (day) => {
+      const { rows } = await pool.query(
         `SELECT a.id, a.title, a.url, a.summary, a.published_at, a.fetched_at, a.theme, a.uf,
                 s.name AS source_name, s.type AS source_type, s.city AS source_city
          FROM articles a
          LEFT JOIN sources s ON s.id = a.source_id
          WHERE COALESCE(a.uf, s.uf) = $1
+           AND (COALESCE(a.published_at, a.fetched_at) AT TIME ZONE 'America/Sao_Paulo')::date = $2::date
          ORDER BY COALESCE(a.published_at, a.fetched_at) DESC
-         LIMIT 80`,
-        [uf]
+         LIMIT 150`,
+        [uf, day]
       );
-      rows = r.rows;
-    } else {
-      const r = await pool.query(
-        `SELECT a.id, a.title, a.url, a.summary, a.published_at, a.fetched_at, a.theme, a.uf,
-                s.name AS source_name, s.type AS source_type, s.city AS source_city
-         FROM articles a
-         LEFT JOIN sources s ON s.id = a.source_id
-         WHERE COALESCE(a.uf, s.uf) = $1
-           AND COALESCE(a.published_at, a.fetched_at)::date = $2::date
-         ORDER BY COALESCE(a.published_at, a.fetched_at) DESC
-         LIMIT 100`,
-        [uf, date]
-      );
-      rows = r.rows;
-      // Se o dia está vazio, mostra recentes (útil logo após ingest)
-      if (!rows.length) {
-        const fallback = await pool.query(
-          `SELECT a.id, a.title, a.url, a.summary, a.published_at, a.fetched_at, a.theme, a.uf,
-                  s.name AS source_name, s.type AS source_type, s.city AS source_city
-           FROM articles a
-           LEFT JOIN sources s ON s.id = a.source_id
-           WHERE COALESCE(a.uf, s.uf) = $1
-           ORDER BY COALESCE(a.published_at, a.fetched_at) DESC
-           LIMIT 40`,
-          [uf]
-        );
-        return res.json({
-          uf,
-          date,
-          fallback: true,
-          items: fallback.rows.map(mapArticle),
-          note: "Sem itens na data; mostrando recentes.",
-        });
+      return rows;
+    };
+
+    let rows = await queryDay(date);
+    if (!rows.length && date === todayBr) {
+      rows = await queryDay(yesterdayBr);
+      if (rows.length) {
+        date = yesterdayBr;
+        mode = "yesterday-fallback";
       }
     }
-    res.json({ uf, date, items: rows.map(mapArticle) });
+    if (!rows.length) {
+      const recent = await pool.query(
+        `SELECT a.id, a.title, a.url, a.summary, a.published_at, a.fetched_at, a.theme, a.uf,
+                s.name AS source_name, s.type AS source_type, s.city AS source_city
+         FROM articles a
+         LEFT JOIN sources s ON s.id = a.source_id
+         WHERE COALESCE(a.uf, s.uf) = $1
+         ORDER BY COALESCE(a.published_at, a.fetched_at) DESC
+         LIMIT 40`,
+        [uf]
+      );
+      rows = recent.rows;
+      mode = "recent";
+    }
+
+    const bySourceMap = new Map();
+    for (const r of rows) {
+      const key = r.source_name || "Sem fonte";
+      bySourceMap.set(key, (bySourceMap.get(key) || 0) + 1);
+    }
+    const bySource = [...bySourceMap.entries()]
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+
+    const label =
+      date === todayBr ? "Hoje" : date === yesterdayBr ? "Ontem" : date;
+
+    res.json({
+      uf,
+      date,
+      today: todayBr,
+      yesterday: yesterdayBr,
+      label,
+      mode,
+      count: rows.length,
+      bySource,
+      items: rows.map(mapArticle),
+      note:
+        mode === "yesterday-fallback"
+          ? "Sem matérias marcadas para hoje — mostrando ontem."
+          : mode === "recent"
+            ? "Sem itens no dia — mostrando recentes."
+            : null,
+    });
   } catch (err) {
     res.status(500).json({ error: String(err.message || err) });
   }

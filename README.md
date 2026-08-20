@@ -15,7 +15,8 @@ Ver [docs/SPRINTS.md](docs/SPRINTS.md) — 5 sprints curtos.
 |---|------|--------|
 | 1 | Fundação | feito |
 | 2 | Ingestão PE | feito |
-| 3 | Digest | próximo |
+| 3 | Digest | feito |
+| 4 | Temas | próximo |
 | 4 | Temas | — |
 | 5 | Alertas | — |
 
