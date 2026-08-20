@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import "./App.css";
 
 type Meta = {
@@ -13,6 +13,7 @@ type DigestItem = {
   title: string;
   url: string;
   source: string | null;
+  theme?: string | null;
   publishedAt: string | null;
   fetchedAt: string | null;
 };
@@ -24,9 +25,21 @@ type Digest = {
   label?: string;
   count?: number;
   bySource?: { name: string; count: number }[];
+  byTheme?: { name: string; count: number }[];
   items: DigestItem[];
   note?: string | null;
 };
+
+const THEME_CHIPS = [
+  "todos",
+  "política",
+  "economia",
+  "segurança",
+  "saúde",
+  "educação",
+  "meio ambiente",
+  "outros",
+];
 
 function fmtTime(iso: string | null | undefined) {
   if (!iso) return "—";
@@ -61,22 +74,37 @@ export default function App() {
   const [digest, setDigest] = useState<Digest | null>(null);
   const [anchors, setAnchors] = useState<{ today: string; yesterday: string } | null>(null);
   const [day, setDay] = useState<"today" | "yesterday">("today");
+  const [theme, setTheme] = useState("todos");
+  const [q, setQ] = useState("");
+  const [qDraft, setQDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
 
   const loadMeta = () => fetch("/api/meta").then((r) => r.json()).then(setMeta);
 
-  const loadDigest = async (which: "today" | "yesterday", base?: Digest) => {
+  const digestUrl = (date: string, themeVal: string, query: string) => {
+    const params = new URLSearchParams({ uf: "PE", date });
+    if (themeVal && themeVal !== "todos") params.set("theme", themeVal);
+    if (query.trim()) params.set("q", query.trim());
+    return `/api/digest?${params}`;
+  };
+
+  const loadDigest = async (
+    which: "today" | "yesterday",
+    opts?: { theme?: string; q?: string; base?: Digest }
+  ) => {
+    const themeVal = opts?.theme ?? theme;
+    const query = opts?.q ?? q;
     const info =
-      base ||
+      opts?.base ||
       anchors ||
       (await fetch("/api/digest?uf=PE").then((r) => r.json()));
     if (!anchors && info.today && info.yesterday) {
       setAnchors({ today: info.today, yesterday: info.yesterday });
     }
     const date = which === "today" ? info.today : info.yesterday;
-    const d = await fetch(`/api/digest?uf=PE&date=${date}`).then((r) => r.json());
+    const d = await fetch(digestUrl(date, themeVal, query)).then((r) => r.json());
     setDigest(d);
   };
 
@@ -86,7 +114,7 @@ export default function App() {
         if (base.today && base.yesterday) {
           setAnchors({ today: base.today, yesterday: base.yesterday });
         }
-        await loadDigest("today", base);
+        await loadDigest("today", { base });
       })
       .catch((e) => setError(String(e)));
   }, []);
@@ -99,6 +127,28 @@ export default function App() {
       await loadMeta();
     } catch (e) {
       setError(String(e));
+    }
+  };
+
+  const selectTheme = async (next: string) => {
+    setTheme(next);
+    setError(null);
+    try {
+      await loadDigest(day, { theme: next });
+    } catch (e) {
+      setError(String(e));
+    }
+  };
+
+  const applySearch = async (e?: FormEvent) => {
+    e?.preventDefault();
+    const next = qDraft.trim();
+    setQ(next);
+    setError(null);
+    try {
+      await loadDigest(day, { q: next });
+    } catch (err) {
+      setError(String(err));
     }
   };
 
@@ -149,7 +199,7 @@ export default function App() {
           </div>
           <div className="kpi">
             <span>Sprint</span>
-            <strong>{meta?.sprint ?? 3}</strong>
+            <strong>{meta?.sprint ?? 4}</strong>
           </div>
         </div>
       </header>
@@ -185,6 +235,33 @@ export default function App() {
         </div>
       </section>
 
+      <section className="filters" aria-label="Filtros">
+        <div className="theme-tabs" role="tablist" aria-label="Tema">
+          {THEME_CHIPS.map((t) => (
+            <button
+              key={t}
+              type="button"
+              className={theme === t ? "tab on" : "tab"}
+              onClick={() => selectTheme(t)}
+            >
+              {t === "todos" ? "Todos" : t}
+            </button>
+          ))}
+        </div>
+        <form className="search" onSubmit={applySearch}>
+          <input
+            type="search"
+            placeholder="Buscar título, resumo ou veículo…"
+            value={qDraft}
+            onChange={(e) => setQDraft(e.target.value)}
+            aria-label="Busca"
+          />
+          <button type="submit" className="btn ghost">
+            Buscar
+          </button>
+        </form>
+      </section>
+
       {error && <p className="err">{error}</p>}
       {(flash || digest?.note) && <p className="note">{flash || digest?.note}</p>}
 
@@ -201,9 +278,9 @@ export default function App() {
       <section className="board">
         {items.length === 0 ? (
           <div className="empty">
-            <p className="empty-title">Sem matérias neste dia</p>
+            <p className="empty-title">Sem matérias neste filtro</p>
             <p>
-              Troque para Ontem ou rode <strong>Coletar agora</strong>.
+              Ajuste o tema/busca, troque o dia ou rode <strong>Coletar agora</strong>.
             </p>
           </div>
         ) : (
@@ -217,7 +294,10 @@ export default function App() {
                   <a href={it.url} target="_blank" rel="noreferrer">
                     {it.title}
                   </a>
-                  <span className="vehicle">{it.source || "Fonte"}</span>
+                  <span className="meta-line">
+                    <span className="vehicle">{it.source || "Fonte"}</span>
+                    {it.theme ? <span className="theme-tag">{it.theme}</span> : null}
+                  </span>
                 </div>
               </li>
             ))}
@@ -226,7 +306,7 @@ export default function App() {
       </section>
 
       <footer className="foot">
-        Farol · Sprint {meta?.sprint ?? 3} · paralelo ao Radar Imprensa
+        Farol · Sprint {meta?.sprint ?? 4} · paralelo ao Radar Imprensa
       </footer>
     </div>
   );

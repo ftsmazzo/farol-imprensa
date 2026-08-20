@@ -1,4 +1,6 @@
 import crypto from "node:crypto";
+import { cleanTitle } from "./cleanTitle.js";
+import { classifyTheme } from "./themes.js";
 
 function hashUrl(url) {
   return crypto.createHash("sha256").update(String(url).trim()).digest("hex").slice(0, 40);
@@ -36,7 +38,8 @@ export function parseFeed(xml) {
       const bare = block.match(/<link>([^<]+)<\/link>/i);
       link = bare ? decodeXml(bare[1]) : null;
     }
-    const summary = tag(block, "description") || tag(block, "summary") || tag(block, "content") || null;
+    const summaryRaw =
+      tag(block, "description") || tag(block, "summary") || tag(block, "content") || null;
     const pub =
       tag(block, "pubDate") ||
       tag(block, "published") ||
@@ -44,13 +47,11 @@ export function parseFeed(xml) {
       tag(block, "dc:date") ||
       null;
     if (!title || !link) continue;
-    // Google News: "Título - Veículo"
-    if (title.includes(" - ")) {
-      const parts = title.split(" - ");
-      if (parts.length >= 2 && parts[parts.length - 1].length < 60) {
-        title = parts.slice(0, -1).join(" - ").trim();
-      }
-    }
+    title = cleanTitle(title);
+    const summary = summaryRaw
+      ? summaryRaw.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 1000)
+      : null;
+    const theme = classifyTheme(title, summary);
     let publishedAt = null;
     if (pub) {
       const d = new Date(pub);
@@ -59,8 +60,9 @@ export function parseFeed(xml) {
     items.push({
       title: title.slice(0, 500),
       url: link.slice(0, 2000),
-      summary: summary ? summary.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 1000) : null,
+      summary,
       publishedAt,
+      theme,
     });
   }
   return items;
@@ -90,18 +92,19 @@ export async function ingestSource(pool, source) {
     for (const item of items) {
       const urlHash = hashUrl(item.url);
       const result = await pool.query(
-        `INSERT INTO articles (source_id, url, url_hash, title, summary, published_at, uf, raw)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8::jsonb)
+        `INSERT INTO articles (source_id, url, url_hash, title, summary, published_at, uf, theme, raw)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9::jsonb)
          ON CONFLICT (url_hash) DO NOTHING
          RETURNING id`,
         [
           source.id,
           item.url,
           urlHash,
-          item.title,
+          cleanTitle(item.title, source.name),
           item.summary,
           item.publishedAt,
           source.uf,
+          item.theme || classifyTheme(item.title, item.summary),
           JSON.stringify({ ingest: "rss", at: new Date().toISOString() }),
         ]
       );

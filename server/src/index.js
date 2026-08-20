@@ -3,8 +3,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import pg from "pg";
+import { cleanTitle } from "./cleanTitle.js";
 import { runIngest } from "./ingest.js";
 import { seedSources } from "./seed.js";
+import { THEMES, classifyTheme } from "./themes.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // __dirname = .../server/src → raiz do repo/imagem = ../..
@@ -14,7 +16,7 @@ const { Pool } = pg;
 const PORT = Number(process.env.PORT || 3100);
 const DATABASE_URL = process.env.DATABASE_URL || "";
 const INGEST_TOKEN = process.env.INGEST_TOKEN || "";
-const SPRINT = 3;
+const SPRINT = 4;
 
 const pool = DATABASE_URL
   ? new Pool({
@@ -113,19 +115,46 @@ function requireIngestAuth(req, res) {
 }
 
 function mapArticle(r) {
+  const title = cleanTitle(r.title, r.source_name);
+  const theme = r.theme || classifyTheme(title, r.summary);
   return {
     id: r.id,
-    title: r.title,
+    title,
     url: r.url,
     summary: r.summary,
     publishedAt: r.published_at,
     fetchedAt: r.fetched_at,
-    theme: r.theme,
+    theme,
     uf: r.uf,
     source: r.source_name,
     sourceType: r.source_type,
     city: r.source_city,
   };
+}
+
+/** Corrige títulos colados e preenche tema nos registros antigos. */
+async function backfillArticles() {
+  if (!pool) return;
+  const { rows } = await pool.query(
+    `SELECT a.id, a.title, a.summary, a.theme, s.name AS source_name
+     FROM articles a
+     LEFT JOIN sources s ON s.id = a.source_id
+     ORDER BY a.id DESC
+     LIMIT 2000`
+  );
+  let fixed = 0;
+  for (const r of rows) {
+    const title = cleanTitle(r.title, r.source_name);
+    const theme = r.theme || classifyTheme(title, r.summary);
+    if (title === r.title && theme === r.theme) continue;
+    await pool.query(`UPDATE articles SET title = $1, theme = $2 WHERE id = $3`, [
+      title,
+      theme,
+      r.id,
+    ]);
+    fixed += 1;
+  }
+  if (fixed) console.log(`Backfill: ${fixed} artigos (título/tema)`);
 }
 
 const app = express();
@@ -243,8 +272,14 @@ app.post("/api/ingest/run", async (req, res) => {
   }
 });
 
+app.get("/api/themes", (_req, res) => {
+  res.json({ themes: THEMES });
+});
+
 app.get("/api/digest", async (req, res) => {
   const uf = String(req.query.uf || "PE").toUpperCase();
+  const themeFilter = String(req.query.theme || "").trim().toLowerCase();
+  const q = String(req.query.q || "").trim();
   const todayBr = dateInBrasilia();
   const yesterdayBr = shiftDateISO(todayBr, -1);
   let date = String(req.query.date || todayBr);
@@ -253,50 +288,79 @@ app.get("/api/digest", async (req, res) => {
     return res.json({ uf, date, today: todayBr, count: 0, items: [], bySource: [], note: "Sem banco" });
   }
   try {
+    const filters = [];
+    const params = [uf];
+    let p = 2;
+
+    if (themeFilter && themeFilter !== "todos" && themeFilter !== "all") {
+      filters.push(`LOWER(COALESCE(a.theme, 'outros')) = $${p}`);
+      params.push(themeFilter);
+      p += 1;
+    }
+    if (q) {
+      filters.push(
+        `(a.title ILIKE $${p} OR COALESCE(a.summary, '') ILIKE $${p} OR COALESCE(s.name, '') ILIKE $${p})`
+      );
+      params.push(`%${q}%`);
+      p += 1;
+    }
+    const extra = filters.length ? ` AND ${filters.join(" AND ")}` : "";
+
     const queryDay = async (day) => {
+      const dayParams = [...params, day];
+      const dayIdx = dayParams.length;
       const { rows } = await pool.query(
         `SELECT a.id, a.title, a.url, a.summary, a.published_at, a.fetched_at, a.theme, a.uf,
                 s.name AS source_name, s.type AS source_type, s.city AS source_city
          FROM articles a
          LEFT JOIN sources s ON s.id = a.source_id
          WHERE COALESCE(a.uf, s.uf) = $1
-           AND (COALESCE(a.published_at, a.fetched_at) AT TIME ZONE 'America/Sao_Paulo')::date = $2::date
+           AND (COALESCE(a.published_at, a.fetched_at) AT TIME ZONE 'America/Sao_Paulo')::date = $${dayIdx}::date
+           ${extra}
          ORDER BY COALESCE(a.published_at, a.fetched_at) DESC
          LIMIT 150`,
-        [uf, day]
+        dayParams
       );
       return rows;
     };
 
     let rows = await queryDay(date);
-    if (!rows.length && date === todayBr) {
+    if (!rows.length && date === todayBr && !themeFilter && !q) {
       rows = await queryDay(yesterdayBr);
       if (rows.length) {
         date = yesterdayBr;
         mode = "yesterday-fallback";
       }
     }
-    if (!rows.length) {
+    if (!rows.length && !themeFilter && !q) {
       const recent = await pool.query(
         `SELECT a.id, a.title, a.url, a.summary, a.published_at, a.fetched_at, a.theme, a.uf,
                 s.name AS source_name, s.type AS source_type, s.city AS source_city
          FROM articles a
          LEFT JOIN sources s ON s.id = a.source_id
          WHERE COALESCE(a.uf, s.uf) = $1
+           ${extra}
          ORDER BY COALESCE(a.published_at, a.fetched_at) DESC
          LIMIT 40`,
-        [uf]
+        params
       );
       rows = recent.rows;
       mode = "recent";
     }
 
     const bySourceMap = new Map();
+    const byThemeMap = new Map();
     for (const r of rows) {
       const key = r.source_name || "Sem fonte";
       bySourceMap.set(key, (bySourceMap.get(key) || 0) + 1);
+      const mapped = mapArticle(r);
+      const th = mapped.theme || "outros";
+      byThemeMap.set(th, (byThemeMap.get(th) || 0) + 1);
     }
     const bySource = [...bySourceMap.entries()]
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+    const byTheme = [...byThemeMap.entries()]
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count);
 
@@ -310,8 +374,11 @@ app.get("/api/digest", async (req, res) => {
       yesterday: yesterdayBr,
       label,
       mode,
+      theme: themeFilter || null,
+      q: q || null,
       count: rows.length,
       bySource,
+      byTheme,
       items: rows.map(mapArticle),
       note:
         mode === "yesterday-fallback"
@@ -340,6 +407,7 @@ if (pool) {
     await pool.query("select 1");
     await migrate();
     await seedSources(pool, root);
+    await backfillArticles();
   } catch (err) {
     console.warn("Postgres indisponível no boot:", err.message || err);
   }

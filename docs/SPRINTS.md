@@ -74,9 +74,10 @@ Depois do 5 = MVP utilizável. Escala UF/Brasil só após calibrar PE.
 **Objetivo:** achar pauta sem planilha.
 
 **Entregáveis**
-- Classificação v0 (regras/keywords → tema)
-- Filtro por tema + busca texto
-- Temas iniciais: política, economia, segurança, saúde, educação, outros
+- [x] Classificação v0 (regras/keywords → tema)
+- [x] Filtro por tema + busca texto (`?theme=` / `?q=`)
+- [x] Temas: política, economia, segurança, saúde, educação, meio ambiente, outros
+- [x] Limpeza de título colado à fonte (ex.: `CabrobóBlog…` → `Cabrobó`)
 
 **DoD:** filtrar “política” e buscar um sobrenome retorna subset coerente.
 

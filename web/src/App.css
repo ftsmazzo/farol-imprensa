@@ -131,6 +131,63 @@ body {
   cursor: wait;
 }
 
+.btn.ghost {
+  background: transparent;
+  color: var(--beam);
+  border: 1px solid rgba(240, 180, 41, 0.45);
+}
+
+.filters {
+  margin-top: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.theme-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.search {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.search input {
+  flex: 1;
+  min-width: 12rem;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+}
+
+.search input::placeholder {
+  color: var(--muted);
+}
+
+.meta-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+  margin-top: 0.35rem;
+}
+
+.theme-tag {
+  color: var(--beam);
+  font-size: 0.75rem;
+  text-transform: lowercase;
+  letter-spacing: 0.02em;
+  border: 1px solid rgba(240, 180, 41, 0.35);
+  padding: 0.1rem 0.4rem;
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -207,7 +264,6 @@ body {
 
 .vehicle {
   display: inline-block;
-  margin-top: 0.35rem;
   color: var(--muted);
   font-size: 0.82rem;
 }
