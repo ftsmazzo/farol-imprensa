@@ -19,6 +19,15 @@ Ver [docs/SPRINTS.md](docs/SPRINTS.md) — 5 sprints curtos.
 | 4 | Temas | — |
 | 5 | Alertas | — |
 
+## Produção (Easypanel)
+
+- **Projeto:** `farol-imprensa`
+- **Serviços:** `web` + `postgres`
+- **URL:** https://farol-imprensa-web.kxryyk.easypanel.host
+- **Repo:** https://github.com/ftsmazzo/farol-imprensa
+
+Health: `/api/health` · Meta: `/api/meta` · Digest: `/api/digest?uf=PE`
+
 ## Local (Sprint 1)
 
 ```bash
