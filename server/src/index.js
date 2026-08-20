@@ -5,7 +5,8 @@ import { fileURLToPath } from "node:url";
 import pg from "pg";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const root = path.resolve(__dirname, "..");
+// __dirname = .../server/src → raiz do repo/imagem = ../..
+const root = path.resolve(__dirname, "../..");
 const { Pool } = pg;
 
 const PORT = Number(process.env.PORT || 3100);
