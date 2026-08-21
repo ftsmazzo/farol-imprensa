@@ -22,6 +22,7 @@ import {
 import { runIngest } from "./ingest.js";
 import { seedSources } from "./seed.js";
 import { THEMES, classifyTheme } from "./themes.js";
+import { NE_UFS, normalizeUf } from "./ufs.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // __dirname = .../server/src → raiz do repo/imagem = ../..
@@ -33,7 +34,7 @@ const DATABASE_URL = process.env.DATABASE_URL || "";
 const INGEST_TOKEN = process.env.INGEST_TOKEN || "";
 const ALERT_WHATSAPP_TO = process.env.ALERT_WHATSAPP_TO || "";
 const ALERT_EVOLUTION_INSTANCE = process.env.ALERT_EVOLUTION_INSTANCE || "";
-const SPRINT = 6;
+const SPRINT = 7;
 
 const pool = DATABASE_URL
   ? new Pool({
@@ -244,6 +245,8 @@ app.get("/api/meta", async (_req, res) => {
       service: "farol",
       sprint: SPRINT,
       pilotUf: "PE",
+      pilotUfs: NE_UFS.map((x) => x.uf),
+      ufs: NE_UFS,
       sources: 0,
       articles: 0,
       sourcesWithRss: 0,
@@ -267,6 +270,8 @@ app.get("/api/meta", async (_req, res) => {
       service: "farol",
       sprint: SPRINT,
       pilotUf: "PE",
+      pilotUfs: NE_UFS.map((x) => x.uf),
+      ufs: NE_UFS,
       db: true,
       sources: r.sources,
       sourcesWithRss: r.sources_rss,
@@ -279,8 +284,8 @@ app.get("/api/meta", async (_req, res) => {
       pushConfigured: Boolean(getVapidPublicKey()),
       note:
         r.articles > 0
-          ? "Sprint 6: PWA + Web Push. Instale e escolha temas/personalidades."
-          : "Fontes PE seedadas. Rode a coleta para popular o digest.",
+          ? "Sprint 7: Nordeste multi-UF. Escolha o estado no app."
+          : "Fontes seedadas. Rode a coleta para popular o digest.",
     });
   } catch (err) {
     res.status(500).json({ error: String(err.message || err) });
@@ -324,7 +329,7 @@ app.post("/api/ingest/run", async (req, res) => {
   const uf = String(req.body?.uf || "PE").toUpperCase();
   ingestRunning = true;
   try {
-    const report = await runIngest(pool, { uf });
+    const report = await runIngest(pool, { uf: normalizeUf(uf) });
     res.status(202).json(report);
   } catch (err) {
     res.status(500).json({ error: String(err.message || err) });
@@ -701,12 +706,16 @@ app.post("/api/push/rematch", async (req, res) => {
   }
 });
 
+app.get("/api/ufs", (_req, res) => {
+  res.json({ ufs: NE_UFS });
+});
+
 app.get("/api/themes", (_req, res) => {
   res.json({ themes: THEMES });
 });
 
 app.get("/api/digest", async (req, res) => {
-  const uf = String(req.query.uf || "PE").toUpperCase();
+  const uf = normalizeUf(req.query.uf || "PE");
   const themeFilter = String(req.query.theme || "").trim().toLowerCase();
   const q = String(req.query.q || "").trim();
   const todayBr = dateInBrasilia();

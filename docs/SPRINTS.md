@@ -16,6 +16,7 @@ Ciclos **curtos** (1–2 dias cada). Cada sprint tem: objetivo, entregável, DoD
 | **4** | Temas | Filtro por tema + busca |
 | **5** | Alertas | Regras + disparo n8n (1 canal) |
 | **6** | Notify PWA | Preferências + Web Push instalável |
+| **7** | Nordeste | Expansão multi-UF (9 estados) |
 
 Depois do 5 = MVP utilizável. Escala UF/Brasil só após calibrar PE.
 
@@ -124,6 +125,21 @@ Depois do 5 = MVP utilizável. Escala UF/Brasil só após calibrar PE.
 
 **Env**
 - `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` (mailto:…)
+
+---
+
+## Sprint 7 — Expansão Nordeste
+
+**Objetivo:** sair do piloto PE e cobrir os 9 estados.
+
+**Entregáveis**
+- [x] Seed `sources-ne-v1.json` (Top Radar/UF + G1 estadual)
+- [x] API `GET /api/ufs` + digest/ingest por UF
+- [x] Seletor de UF no app (consumidor + admin)
+
+**DoD:** escolher BA/CE/…, coletar e ver digest do estado.
+
+**Fora:** capital vs interior, ranking recalibrado por cidade.
 
 ---
 

@@ -65,6 +65,33 @@ const PREF_THEMES = [
   "meio ambiente",
 ];
 
+const UF_KEY = "farol_uf";
+
+const NE_UFS = [
+  { uf: "AL", name: "Alagoas" },
+  { uf: "BA", name: "Bahia" },
+  { uf: "CE", name: "Ceará" },
+  { uf: "MA", name: "Maranhão" },
+  { uf: "PB", name: "Paraíba" },
+  { uf: "PE", name: "Pernambuco" },
+  { uf: "PI", name: "Piauí" },
+  { uf: "RN", name: "Rio Grande do Norte" },
+  { uf: "SE", name: "Sergipe" },
+];
+
+function readUf() {
+  if (typeof window === "undefined") return "PE";
+  const q = new URLSearchParams(window.location.search).get("uf");
+  if (q && NE_UFS.some((x) => x.uf === q.toUpperCase())) return q.toUpperCase();
+  try {
+    const saved = localStorage.getItem(UF_KEY);
+    if (saved && NE_UFS.some((x) => x.uf === saved)) return saved;
+  } catch {
+    /* ignore */
+  }
+  return "PE";
+}
+
 /** Admin só com ?admin=1 na URL — não grava no localStorage. */
 function readAdminMode() {
   if (typeof window === "undefined") return false;
@@ -103,6 +130,7 @@ function fmtWhen(iso: string | null | undefined) {
 export default function App() {
   const [admin] = useState(readAdminMode);
   const [tab, setTab] = useState<"ler" | "alertas">("ler");
+  const [uf, setUf] = useState(readUf);
   const [meta, setMeta] = useState<Meta | null>(null);
   const [digest, setDigest] = useState<Digest | null>(null);
   const [anchors, setAnchors] = useState<{ today: string; yesterday: string } | null>(null);
@@ -132,8 +160,8 @@ export default function App() {
     setEvents(Array.isArray(e) ? e : []);
   };
 
-  const digestUrl = (date: string, themeVal: string, query: string) => {
-    const params = new URLSearchParams({ uf: "PE", date });
+  const digestUrl = (date: string, themeVal: string, query: string, ufVal = uf) => {
+    const params = new URLSearchParams({ uf: ufVal, date });
     if (themeVal && themeVal !== "todos") params.set("theme", themeVal);
     if (query.trim()) params.set("q", query.trim());
     return `/api/digest?${params}`;
@@ -141,19 +169,20 @@ export default function App() {
 
   const loadDigest = async (
     which: "today" | "yesterday",
-    opts?: { theme?: string; q?: string; base?: Digest }
+    opts?: { theme?: string; q?: string; base?: Digest; uf?: string }
   ) => {
     const themeVal = opts?.theme ?? theme;
     const query = opts?.q ?? q;
+    const ufVal = opts?.uf ?? uf;
     const info =
       opts?.base ||
       anchors ||
-      (await fetch("/api/digest?uf=PE").then((r) => r.json()));
+      (await fetch(`/api/digest?uf=${ufVal}`).then((r) => r.json()));
     if (!anchors && info.today && info.yesterday) {
       setAnchors({ today: info.today, yesterday: info.yesterday });
     }
     const date = which === "today" ? info.today : info.yesterday;
-    const d = await fetch(digestUrl(date, themeVal, query)).then((r) => r.json());
+    const d = await fetch(digestUrl(date, themeVal, query, ufVal)).then((r) => r.json());
     setDigest(d);
   };
 
@@ -167,7 +196,7 @@ export default function App() {
     const boot = async () => {
       const jobs: Promise<unknown>[] = [
         fetch("/api/meta").then((r) => r.json()).then(setMeta),
-        fetch("/api/digest?uf=PE").then((r) => r.json()),
+        fetch(`/api/digest?uf=${uf}`).then((r) => r.json()),
         fetch(`/api/push/me?deviceId=${encodeURIComponent(getDeviceId())}`)
           .then((r) => r.json())
           .then((me) => {
@@ -191,7 +220,31 @@ export default function App() {
     };
 
     boot().catch((e) => setError(String(e)));
-  }, [admin]);
+  }, [admin, uf]);
+
+  const changeUf = async (next: string) => {
+    const u = next.toUpperCase();
+    setUf(u);
+    try {
+      localStorage.setItem(UF_KEY, u);
+    } catch {
+      /* ignore */
+    }
+    setAnchors(null);
+    setError(null);
+    setTheme("todos");
+    setQ("");
+    setQDraft("");
+    try {
+      const base = await fetch(`/api/digest?uf=${u}`).then((r) => r.json());
+      if (base.today && base.yesterday) {
+        setAnchors({ today: base.today, yesterday: base.yesterday });
+      }
+      await loadDigest(day, { uf: u, theme: "todos", q: "", base });
+    } catch (e) {
+      setError(String(e));
+    }
+  };
 
   const selectDay = async (which: "today" | "yesterday") => {
     setDay(which);
@@ -233,7 +286,7 @@ export default function App() {
       const r = await fetch("/api/ingest/run", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ uf: "PE" }),
+        body: JSON.stringify({ uf }),
       });
       const j = await r.json();
       if (!r.ok) throw new Error(j.error || r.statusText);
@@ -259,7 +312,7 @@ export default function App() {
         body: JSON.stringify({
           name: ruleName.trim(),
           keywords: ruleKeywords,
-          uf: "PE",
+          uf,
         }),
       });
       const j = await r.json();
@@ -331,7 +384,7 @@ export default function App() {
         .split(/[,;|/]+/)
         .map((s) => s.trim())
         .filter(Boolean);
-      await subscribePush(prefThemes, keywords, "PE");
+      await subscribePush(prefThemes, keywords, uf);
       setPushOn(true);
       setFlash("Alertas ativados neste aparelho.");
     } catch (err) {
@@ -385,8 +438,22 @@ export default function App() {
         <header className="consumer-top">
           <div>
             <p className="brand">Farol</p>
-            <p className="tag">Imprensa de PE no seu celular</p>
+            <p className="tag">Imprensa do Nordeste no seu celular</p>
           </div>
+          <label className="uf-pick">
+            <span>Estado</span>
+            <select
+              value={uf}
+              onChange={(e) => changeUf(e.target.value)}
+              aria-label="Estado"
+            >
+              {NE_UFS.map((x) => (
+                <option key={x.uf} value={x.uf}>
+                  {x.uf} — {x.name}
+                </option>
+              ))}
+            </select>
+          </label>
           <nav className="consumer-nav" aria-label="Navegação">
             <button
               type="button"
@@ -435,7 +502,7 @@ export default function App() {
               </div>
               <h1>
                 {digest?.label || "Hoje"}
-                <span> · PE</span>
+                <span> · {uf}</span>
               </h1>
               <p>{digest?.count ?? 0} matérias</p>
             </section>
@@ -485,7 +552,7 @@ export default function App() {
           <section className="prefs" aria-label="Meus alertas">
             <h1>Meus alertas</h1>
             <p className="prefs-lead">
-              Escolha temas e pessoas. Ative o push e teste neste aparelho.
+              Escolha temas e pessoas em {uf}. Ative o push e teste neste aparelho.
             </p>
 
             <p className="prefs-label">Temas</p>
@@ -555,7 +622,7 @@ export default function App() {
           </section>
         )}
 
-        <footer className="foot consumer-foot">Farol · Pernambuco</footer>
+        <footer className="foot consumer-foot">Farol · Nordeste</footer>
       </div>
     );
   }
@@ -584,7 +651,7 @@ export default function App() {
           </div>
           <div className="kpi">
             <span>Sprint</span>
-            <strong>{meta?.sprint ?? 6}</strong>
+                <strong>{meta?.sprint ?? 7}</strong>
           </div>
         </div>
       </header>
@@ -597,8 +664,18 @@ export default function App() {
             {meta?.lastFetchAt ? ` · última coleta ${fmtWhen(meta.lastFetchAt)}` : ""}
           </p>
         </div>
-        <div className="actions">
-          <div className="day-tabs" role="tablist" aria-label="Dia">
+            <div className="actions">
+              <label className="uf-pick compact">
+                <span>UF</span>
+                <select value={uf} onChange={(e) => changeUf(e.target.value)} aria-label="UF">
+                  {NE_UFS.map((x) => (
+                    <option key={x.uf} value={x.uf}>
+                      {x.uf}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <div className="day-tabs" role="tablist" aria-label="Dia">
             <button
               type="button"
               className={day === "today" ? "tab on" : "tab"}

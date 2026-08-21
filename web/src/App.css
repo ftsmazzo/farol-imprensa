@@ -77,6 +77,39 @@ body {
   margin-bottom: 1.5rem;
 }
 
+.uf-pick {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0.35rem 0 0.15rem;
+}
+
+.uf-pick span {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.uf-pick select {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--line);
+  background: rgba(11, 18, 32, 0.55);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+}
+
+.uf-pick.compact {
+  margin: 0;
+  min-width: 5rem;
+}
+
+.uf-pick.compact select {
+  padding: 0.55rem 0.6rem;
+}
+
 .consumer-nav {
   display: grid;
   grid-template-columns: 1fr 1fr;

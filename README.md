@@ -19,6 +19,7 @@ Ver [docs/SPRINTS.md](docs/SPRINTS.md) — sprints curtos.
 | 4 | Temas | feito |
 | 5 | Alertas | feito |
 | 6 | Notify PWA | feito |
+| 7 | Nordeste multi-UF | feito |
 
 ## Produção (Easypanel)
 
