@@ -25,6 +25,7 @@ body {
   font-family: var(--font-body);
   color: var(--ink);
   background: var(--bg);
+  -webkit-font-smoothing: antialiased;
 }
 
 .shell {
@@ -32,6 +33,11 @@ body {
   max-width: 1080px;
   margin: 0 auto;
   padding: 1.75rem 1.25rem 3rem;
+}
+
+.shell.consumer {
+  max-width: 42rem;
+  padding: 1.35rem 1.1rem 4.5rem;
 }
 
 .sky {
@@ -44,15 +50,6 @@ body {
     linear-gradient(180deg, #0b1220 0%, #101a2c 45%, #0b1220 100%);
 }
 
-.top {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.25rem;
-  justify-content: space-between;
-  align-items: end;
-  margin-bottom: 2rem;
-}
-
 .brand {
   margin: 0;
   font-family: var(--font-display);
@@ -62,11 +59,188 @@ body {
   color: var(--beam);
 }
 
+.shell.consumer .brand {
+  font-size: clamp(2.8rem, 10vw, 3.4rem);
+}
+
 .tag {
   margin: 0.4rem 0 0;
   max-width: 28rem;
   color: var(--muted);
   font-size: 0.98rem;
+}
+
+.consumer-top {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.consumer-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+  padding: 0.3rem;
+  border: 1px solid var(--line);
+  background: rgba(11, 18, 32, 0.55);
+}
+
+.nav {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 0.7rem 0.5rem;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.nav.on {
+  background: rgba(240, 180, 41, 0.16);
+  color: var(--beam);
+  font-weight: 600;
+}
+
+.consumer-hero {
+  margin-bottom: 1rem;
+}
+
+.consumer-hero h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 7vw, 2.6rem);
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.consumer-hero h1 span {
+  color: var(--muted);
+  font-size: 0.72em;
+}
+
+.consumer-hero > p {
+  margin: 0.4rem 0 0.9rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.theme-tabs.soft {
+  margin-bottom: 0.25rem;
+}
+
+.theme-tabs.soft .tab {
+  padding: 0.4rem 0.7rem;
+  font-size: 0.82rem;
+  border-radius: 0;
+}
+
+.consumer-board {
+  margin-top: 1rem;
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.consumer-board .row {
+  padding: 1rem 0;
+}
+
+.consumer-board .row-body a {
+  font-size: 1.12rem;
+  letter-spacing: -0.01em;
+}
+
+.prefs {
+  padding-top: 0.25rem;
+}
+
+.prefs h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 6vw, 2.4rem);
+  font-weight: 400;
+}
+
+.prefs-lead {
+  margin: 0.55rem 0 1.25rem;
+  color: var(--muted);
+  line-height: 1.45;
+  max-width: 28rem;
+}
+
+.prefs-label {
+  margin: 1.15rem 0 0.45rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.prefs-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.prefs-form input {
+  width: 100%;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--line);
+  background: rgba(11, 18, 32, 0.55);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+}
+
+.btn.install {
+  width: 100%;
+  margin-bottom: 0.35rem;
+}
+
+.prefs-active {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.prefs-active p {
+  margin: 0 0 0.75rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.consumer-foot {
+  display: flex;
+  justify-content: center;
+  margin-top: 2.5rem;
+}
+
+.linkish {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+  opacity: 0.55;
+}
+
+.linkish:hover {
+  opacity: 1;
+  color: var(--beam);
+}
+
+/* —— Admin (desk) —— */
+
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  justify-content: space-between;
+  align-items: end;
+  margin-bottom: 2rem;
 }
 
 .kpis {
@@ -303,12 +477,6 @@ body {
   max-width: 34rem;
 }
 
-.empty ol {
-  margin: 1rem 0 0;
-  padding-left: 1.1rem;
-  color: var(--ink);
-}
-
 .feed {
   list-style: none;
   margin: 0;
@@ -326,19 +494,6 @@ body {
   border: 1px solid var(--line);
   background: var(--panel);
   padding: 1.15rem 1.25rem 1.35rem;
-}
-
-.notify {
-  margin-top: 1.75rem;
-  border: 1px solid rgba(240, 180, 41, 0.28);
-  background: linear-gradient(180deg, rgba(240, 180, 41, 0.08), var(--panel));
-  padding: 1.15rem 1.25rem 1.35rem;
-}
-
-.notify-status {
-  margin: 0.55rem 0 0;
-  color: var(--muted);
-  font-size: 0.85rem;
 }
 
 .alerts-head {

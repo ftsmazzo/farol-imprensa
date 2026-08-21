@@ -47,7 +47,8 @@ VAPID_PRIVATE_KEY=...
 VAPID_SUBJECT=mailto:farol@fabria.ia
 ```
 
-No celular: seção **No celular** → escolher temas/personalidades → **Ativar alertas** → **Instalar app**.
+No celular: app consumidor (**Ler** / **Meus alertas**).  
+Painel da equipe: https://farol-imprensa-web.kxryyk.easypanel.host/?admin=1
 
 ## Local (Sprint 1)
 
