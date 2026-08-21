@@ -22,7 +22,7 @@ import {
 import { runIngest } from "./ingest.js";
 import { seedSources } from "./seed.js";
 import { THEMES, classifyTheme } from "./themes.js";
-import { NE_UFS, normalizeUf } from "./ufs.js";
+import { BR_UFS, normalizeUf } from "./ufs.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // __dirname = .../server/src → raiz do repo/imagem = ../..
@@ -34,7 +34,7 @@ const DATABASE_URL = process.env.DATABASE_URL || "";
 const INGEST_TOKEN = process.env.INGEST_TOKEN || "";
 const ALERT_WHATSAPP_TO = process.env.ALERT_WHATSAPP_TO || "";
 const ALERT_EVOLUTION_INSTANCE = process.env.ALERT_EVOLUTION_INSTANCE || "";
-const SPRINT = 7;
+const SPRINT = 8;
 
 const pool = DATABASE_URL
   ? new Pool({
@@ -245,8 +245,8 @@ app.get("/api/meta", async (_req, res) => {
       service: "farol",
       sprint: SPRINT,
       pilotUf: "PE",
-      pilotUfs: NE_UFS.map((x) => x.uf),
-      ufs: NE_UFS,
+      pilotUfs: BR_UFS.map((x) => x.uf),
+      ufs: BR_UFS,
       sources: 0,
       articles: 0,
       sourcesWithRss: 0,
@@ -270,8 +270,8 @@ app.get("/api/meta", async (_req, res) => {
       service: "farol",
       sprint: SPRINT,
       pilotUf: "PE",
-      pilotUfs: NE_UFS.map((x) => x.uf),
-      ufs: NE_UFS,
+      pilotUfs: BR_UFS.map((x) => x.uf),
+      ufs: BR_UFS,
       db: true,
       sources: r.sources,
       sourcesWithRss: r.sources_rss,
@@ -284,7 +284,7 @@ app.get("/api/meta", async (_req, res) => {
       pushConfigured: Boolean(getVapidPublicKey()),
       note:
         r.articles > 0
-          ? "Sprint 7: Nordeste multi-UF. Escolha o estado no app."
+          ? "Sprint 8: Brasil 27 UFs. Escolha o estado no app."
           : "Fontes seedadas. Rode a coleta para popular o digest.",
     });
   } catch (err) {
@@ -326,11 +326,39 @@ app.post("/api/ingest/run", async (req, res) => {
   if (!requireIngestAuth(req, res)) return;
   if (ingestRunning) return res.status(409).json({ error: "ingestão já em andamento" });
 
-  const uf = String(req.body?.uf || "PE").toUpperCase();
+  const all = Boolean(req.body?.all);
   ingestRunning = true;
   try {
-    const report = await runIngest(pool, { uf: normalizeUf(uf) });
-    res.status(202).json(report);
+    if (all) {
+      const reports = [];
+      let inserted = 0;
+      let skipped = 0;
+      let errors = 0;
+      let sources = 0;
+      for (const { uf } of BR_UFS) {
+        const report = await runIngest(pool, { uf });
+        reports.push({ uf, inserted: report.inserted, skipped: report.skipped, errors: report.errors });
+        inserted += report.inserted || 0;
+        skipped += report.skipped || 0;
+        errors += report.errors || 0;
+        sources += report.sources || 0;
+      }
+      res.status(202).json({
+        ok: true,
+        all: true,
+        ufs: BR_UFS.length,
+        sources,
+        inserted,
+        skipped,
+        errors,
+        reports,
+        finishedAt: new Date().toISOString(),
+      });
+    } else {
+      const uf = normalizeUf(req.body?.uf || "PE");
+      const report = await runIngest(pool, { uf });
+      res.status(202).json(report);
+    }
   } catch (err) {
     res.status(500).json({ error: String(err.message || err) });
   } finally {
@@ -707,7 +735,7 @@ app.post("/api/push/rematch", async (req, res) => {
 });
 
 app.get("/api/ufs", (_req, res) => {
-  res.json({ ufs: NE_UFS });
+  res.json({ ufs: BR_UFS });
 });
 
 app.get("/api/themes", (_req, res) => {

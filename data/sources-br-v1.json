@@ -1,0 +1,1566 @@
+{
+  "version": "sources-br-v1",
+  "ufs": [
+    "AC",
+    "AL",
+    "AM",
+    "AP",
+    "BA",
+    "CE",
+    "DF",
+    "ES",
+    "GO",
+    "MA",
+    "MG",
+    "MS",
+    "MT",
+    "PA",
+    "PB",
+    "PE",
+    "PI",
+    "PR",
+    "RJ",
+    "RN",
+    "RO",
+    "RR",
+    "RS",
+    "SC",
+    "SE",
+    "SP",
+    "TO"
+  ],
+  "note": "Brasil 27 UFs: Nordeste (Radar) + G1 estadual + portais principais + Google News estadual",
+  "generatedAt": "2026-08-21T01:10:56.418Z",
+  "items": [
+    {
+      "id": "pe-g1",
+      "name": "G1 PE",
+      "uf": "PE",
+      "city": "Recife",
+      "type": "Portal",
+      "website": "https://g1.globo.com/pe/pernambuco/",
+      "rssUrl": "https://g1.globo.com/dynamo/pe/pernambuco/rss2.xml",
+      "radarVehicleId": "atlas-11902"
+    },
+    {
+      "id": "pe-marco-zero",
+      "name": "Marco Zero Conteúdo",
+      "uf": "PE",
+      "city": "Recife",
+      "type": "Portal",
+      "website": "http://marcozero.org/",
+      "rssUrl": "https://marcozero.org/feed/",
+      "radarVehicleId": "atlas-11967"
+    },
+    {
+      "id": "pe-ne10",
+      "name": "NE10 (JC Online)",
+      "uf": "PE",
+      "city": "Recife",
+      "type": "Portal",
+      "website": "https://ne10.uol.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:ne10.uol.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-1427"
+    },
+    {
+      "id": "pe-diario",
+      "name": "Diário de Pernambuco",
+      "uf": "PE",
+      "city": "Recife",
+      "type": "Jornal",
+      "website": "https://www.diariodepernambuco.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:diariodepernambuco.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-1439"
+    },
+    {
+      "id": "pe-folhape",
+      "name": "Folha de Pernambuco",
+      "uf": "PE",
+      "city": "Recife",
+      "type": "Jornal",
+      "website": "https://www.folhape.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:folhape.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-11664"
+    },
+    {
+      "id": "pe-leiaja",
+      "name": "LeiaJá",
+      "uf": "PE",
+      "city": "Recife",
+      "type": "Portal",
+      "website": "http://www.leiaja.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:leiaja.com+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-12026"
+    },
+    {
+      "id": "pe-cbn",
+      "name": "CBN Recife",
+      "uf": "PE",
+      "city": "Recife",
+      "type": "Rádio",
+      "website": "http://www.cbnrecife.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:cbnrecife.com+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-12164"
+    },
+    {
+      "id": "pe-ne45",
+      "name": "NE45",
+      "uf": "PE",
+      "city": "Recife",
+      "type": "Blog",
+      "website": "https://ne45.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:ne45.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-14743"
+    },
+    {
+      "id": "pe-didigalvao",
+      "name": "Blog do Didi Galvão",
+      "uf": "PE",
+      "city": "Recife",
+      "type": "Blog",
+      "website": "https://www.didigalvao.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:didigalvao.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-17426"
+    },
+    {
+      "id": "pe-carlosbritto",
+      "name": "Blog do Carlos Britto",
+      "uf": "PE",
+      "city": "Recife",
+      "type": "Blog",
+      "website": "http://www.carlosbritto.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:carlosbritto.com+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-1420"
+    },
+    {
+      "id": "pe-movimento",
+      "name": "Movimento Econômico",
+      "uf": "PE",
+      "city": "Recife",
+      "type": "Blog",
+      "website": "https://movimentoeconomico.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:movimentoeconomico.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-16482"
+    },
+    {
+      "id": "pe-gnews",
+      "name": "Google News · Pernambuco",
+      "uf": "PE",
+      "city": null,
+      "type": "Agregador",
+      "website": "https://news.google.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=Pernambuco+when:1d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "al-g1",
+      "name": "G1 AL",
+      "uf": "AL",
+      "city": "Maceió",
+      "type": "Portal",
+      "website": "https://g1.globo.com/al/alagoas/",
+      "rssUrl": "https://g1.globo.com/dynamo/al/alagoas/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "al-portal-tudo-na-hora-tnh1",
+      "name": "PORTAL TUDO NA HORA - TNH1",
+      "uf": "AL",
+      "city": "Maceió",
+      "type": "Portal",
+      "website": "http://www.TNH1.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:tnh1.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-13"
+    },
+    {
+      "id": "al-gazeta-web",
+      "name": "GAZETA WEB",
+      "uf": "AL",
+      "city": "Maceió",
+      "type": "Portal",
+      "website": "https://gazetaweb.globo.com/portal/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:gazetaweb.globo.com+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-15"
+    },
+    {
+      "id": "al-7-segundos",
+      "name": "7 SEGUNDOS",
+      "uf": "AL",
+      "city": "Arapiraca",
+      "type": "Portal",
+      "website": "http://www.7segundos.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:7segundos.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-11"
+    },
+    {
+      "id": "al-cadaminuto",
+      "name": "CADAMINUTO",
+      "uf": "AL",
+      "city": "Maceió",
+      "type": "Portal",
+      "website": "http://cadaminuto.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:cadaminuto.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-4418"
+    },
+    {
+      "id": "al-gazeta-de-alagoas",
+      "name": "GAZETA DE ALAGOAS",
+      "uf": "AL",
+      "city": "Maceió",
+      "type": "Jornal",
+      "website": "https://www.gazetadealagoas.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:gazetadealagoas.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-11673"
+    },
+    {
+      "id": "al-alagoas-24-horas",
+      "name": "ALAGOAS 24 HORAS",
+      "uf": "AL",
+      "city": "Maceió",
+      "type": "Portal",
+      "website": "http://www.alagoas24horas.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:alagoas24horas.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-18"
+    },
+    {
+      "id": "al-extra",
+      "name": "EXTRA",
+      "uf": "AL",
+      "city": "Maceió",
+      "type": "Jornal",
+      "website": "https://novoextra.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:novoextra.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-27"
+    },
+    {
+      "id": "al-tribuna-hoje",
+      "name": "TRIBUNA HOJE",
+      "uf": "AL",
+      "city": "Maceió",
+      "type": "Jornal",
+      "website": "https://tribunahoje.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:tribunahoje.com+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-1615"
+    },
+    {
+      "id": "ba-g1",
+      "name": "G1 BA",
+      "uf": "BA",
+      "city": "Salvador",
+      "type": "Portal",
+      "website": "https://g1.globo.com/ba/bahia/",
+      "rssUrl": "https://g1.globo.com/dynamo/bahia/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "ba-a-tarde-on-line",
+      "name": "A TARDE ON LINE",
+      "uf": "BA",
+      "city": "Salvador",
+      "type": "Portal",
+      "website": "http://www.atarde.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:atarde.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-91"
+    },
+    {
+      "id": "ba-correio-24-horas",
+      "name": "CORREIO 24 HORAS",
+      "uf": "BA",
+      "city": "Salvador",
+      "type": "Portal",
+      "website": "http://www.correio24horas.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:correio24horas.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-90"
+    },
+    {
+      "id": "ba-bahia-noticias",
+      "name": "BAHIA NOTÍCIAS",
+      "uf": "BA",
+      "city": "Salvador",
+      "type": "Blog",
+      "website": "https://www.bahianoticias.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:bahianoticias.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-97"
+    },
+    {
+      "id": "ba-bnews-antigo-bocao-news",
+      "name": "BNEWS (ANTIGO BOCAO NEWS)",
+      "uf": "BA",
+      "city": "Salvador",
+      "type": "Portal",
+      "website": "http://www.bnews.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:bnews.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-94"
+    },
+    {
+      "id": "ba-ibahia",
+      "name": "IBAHIA",
+      "uf": "BA",
+      "city": "Salvador",
+      "type": "Blog",
+      "website": "https://www.ibahia.com/portal-de-noticias-de-salvador/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:ibahia.com+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-85"
+    },
+    {
+      "id": "ba-metro1-salvador-ba",
+      "name": "METRO1 - SALVADOR - BA",
+      "uf": "BA",
+      "city": "Salvador",
+      "type": "Portal",
+      "website": "https://www.metro1.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:metro1.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-83"
+    },
+    {
+      "id": "ba-bahia-ba",
+      "name": "BAHIA.BA",
+      "uf": "BA",
+      "city": "Salvador",
+      "type": "Portal",
+      "website": "http://bahia.ba",
+      "rssUrl": "https://news.google.com/rss/search?q=site:bahia.ba+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-11847"
+    },
+    {
+      "id": "ba-aratu-online",
+      "name": "ARATU ONLINE",
+      "uf": "BA",
+      "city": "Salvador",
+      "type": "Portal",
+      "website": "http://www.aratuon.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:aratuon.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-89"
+    },
+    {
+      "id": "ce-g1",
+      "name": "G1 CE",
+      "uf": "CE",
+      "city": "Fortaleza",
+      "type": "Portal",
+      "website": "https://g1.globo.com/ce/ceara/",
+      "rssUrl": "https://g1.globo.com/dynamo/ceara/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "ce-diario-do-nordeste",
+      "name": "DIÁRIO DO NORDESTE",
+      "uf": "CE",
+      "city": "Fortaleza",
+      "type": "Jornal",
+      "website": "https://diariodonordeste.verdesmares.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:diariodonordeste.verdesmares.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-177"
+    },
+    {
+      "id": "ce-o-povo-online",
+      "name": "O POVO ONLINE",
+      "uf": "CE",
+      "city": "Fortaleza",
+      "type": "Portal",
+      "website": "https://www.opovo.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:opovo.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-4539"
+    },
+    {
+      "id": "ce-portal-verdes-mares",
+      "name": "PORTAL VERDES MARES",
+      "uf": "CE",
+      "city": "Fortaleza",
+      "type": "Portal",
+      "website": "http://www.verdesmares.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:verdesmares.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-183"
+    },
+    {
+      "id": "ce-o-povo",
+      "name": "O POVO",
+      "uf": "CE",
+      "city": "Fortaleza",
+      "type": "Jornal",
+      "website": "https://www.opovo.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:opovo.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-11991"
+    },
+    {
+      "id": "ce-o-otimista",
+      "name": "O OTIMISTA",
+      "uf": "CE",
+      "city": "Fortaleza",
+      "type": "Jornal",
+      "website": "https://ootimista.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:ootimista.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-16778"
+    },
+    {
+      "id": "ce-cn7",
+      "name": "CN7",
+      "uf": "CE",
+      "city": "Fortaleza",
+      "type": "Blog",
+      "website": "https://cn7.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:cn7.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-14954"
+    },
+    {
+      "id": "ce-ceara-agora",
+      "name": "CEARÁ AGORA",
+      "uf": "CE",
+      "city": "Fortaleza",
+      "type": "Portal",
+      "website": "http://www.cearaagora.com.br/site/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:cearaagora.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-14649"
+    },
+    {
+      "id": "ma-g1",
+      "name": "G1 MA",
+      "uf": "MA",
+      "city": "São Luís",
+      "type": "Portal",
+      "website": "https://g1.globo.com/ma/maranhao/",
+      "rssUrl": "https://g1.globo.com/dynamo/ma/maranhao/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "ma-o-imparcial-online",
+      "name": "O IMPARCIAL ONLINE",
+      "uf": "MA",
+      "city": "São Luís",
+      "type": "Portal",
+      "website": "https://oimparcial.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:oimparcial.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-11987"
+    },
+    {
+      "id": "ma-jornal-pequeno",
+      "name": "JORNAL PEQUENO",
+      "uf": "MA",
+      "city": "São Luís",
+      "type": "Blog",
+      "website": "https://jornalpequeno.blog.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:jornalpequeno.blog.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-15135"
+    },
+    {
+      "id": "ma-portal-guara",
+      "name": "PORTAL GUARÁ",
+      "uf": "MA",
+      "city": "São Luís",
+      "type": "Portal",
+      "website": "https://portalguara.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:portalguara.com+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-15353"
+    },
+    {
+      "id": "ma-atual7",
+      "name": "ATUAL7",
+      "uf": "MA",
+      "city": "São Luís",
+      "type": "Blog",
+      "website": "https://atual7.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:atual7.com+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-14215"
+    },
+    {
+      "id": "ma-blog-gilberto-leda",
+      "name": "BLOG GILBERTO LÊDA",
+      "uf": "MA",
+      "city": "São Luís",
+      "type": "Blog",
+      "website": "https://gilbertoleda.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:gilbertoleda.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-15095"
+    },
+    {
+      "id": "ma-blog-luis-cardoso",
+      "name": "BLOG LUÍS CARDOSO",
+      "uf": "MA",
+      "city": "São Luís",
+      "type": "Blog",
+      "website": "https://luiscardoso.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:luiscardoso.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-15138"
+    },
+    {
+      "id": "ma-blog-marco-aurelio-d-eca",
+      "name": "BLOG MARCO AURÉLIO D'EÇA",
+      "uf": "MA",
+      "city": "São Luís",
+      "type": "Blog",
+      "website": "https://www.marcoaureliodeca.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:marcoaureliodeca.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-15143"
+    },
+    {
+      "id": "pb-g1",
+      "name": "G1 PB",
+      "uf": "PB",
+      "city": "João Pessoa",
+      "type": "Portal",
+      "website": "https://g1.globo.com/pb/paraiba/",
+      "rssUrl": "https://g1.globo.com/dynamo/pb/paraiba/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "pb-portal-correio-cnb-central-de-noticias-b",
+      "name": "PORTAL CORREIO (CNB - CENTRAL DE NOTÍCIAS BRASILEIRAS LTDA)",
+      "uf": "PB",
+      "city": "João Pessoa",
+      "type": "Portal",
+      "website": "https://portalcorreio.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:portalcorreio.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-18639"
+    },
+    {
+      "id": "pb-jornal-da-paraiba",
+      "name": "JORNAL DA PARAÍBA",
+      "uf": "PB",
+      "city": "Campina Grande",
+      "type": "Blog",
+      "website": "https://www.jornaldaparaiba.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:jornaldaparaiba.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-11927"
+    },
+    {
+      "id": "pb-clickpb",
+      "name": "CLICKPB",
+      "uf": "PB",
+      "city": "João Pessoa",
+      "type": "Portal",
+      "website": "http://clickpb.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:clickpb.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-1404"
+    },
+    {
+      "id": "pb-mais-pb",
+      "name": "MAIS PB",
+      "uf": "PB",
+      "city": "João Pessoa",
+      "type": "Blog",
+      "website": "https://www.maispb.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:maispb.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-1389"
+    },
+    {
+      "id": "pb-pb-agora",
+      "name": "PB AGORA",
+      "uf": "PB",
+      "city": "João Pessoa",
+      "type": "Portal",
+      "website": "https://www.pbagora.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:pbagora.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-1403"
+    },
+    {
+      "id": "pb-wscom",
+      "name": "WSCOM",
+      "uf": "PB",
+      "city": "João Pessoa",
+      "type": "Portal",
+      "website": "http://www.wscom.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:wscom.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-1402"
+    },
+    {
+      "id": "pb-paraiba-online",
+      "name": "PARAÍBA ONLINE",
+      "uf": "PB",
+      "city": "Campina Grande",
+      "type": "Portal",
+      "website": "https://paraibaonline.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:paraibaonline.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-15511"
+    },
+    {
+      "id": "pb-polemica-paraiba",
+      "name": "POLÊMICA PARAÍBA",
+      "uf": "PB",
+      "city": "João Pessoa",
+      "type": "Portal",
+      "website": "http://www.polemicaparaiba.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:polemicaparaiba.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-1399"
+    },
+    {
+      "id": "pi-g1",
+      "name": "G1 PI",
+      "uf": "PI",
+      "city": "Teresina",
+      "type": "Portal",
+      "website": "https://g1.globo.com/pi/piaui/",
+      "rssUrl": "https://g1.globo.com/dynamo/pi/piaui/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "pi-meionorte-com",
+      "name": "MEIONORTE.COM",
+      "uf": "PI",
+      "city": "Teresina",
+      "type": "Blog",
+      "website": "http://www.meionorte.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:meionorte.com+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-11969"
+    },
+    {
+      "id": "pi-cidade-verde",
+      "name": "CIDADE VERDE",
+      "uf": "PI",
+      "city": "Teresina",
+      "type": "Portal",
+      "website": "http://www.cidadeverde.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:cidadeverde.com+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-1456"
+    },
+    {
+      "id": "pi-gp1",
+      "name": "GP1",
+      "uf": "PI",
+      "city": "Teresina",
+      "type": "Portal",
+      "website": "http://www.gp1.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:gp1.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-1455"
+    },
+    {
+      "id": "pi-180-graus",
+      "name": "180 GRAUS",
+      "uf": "PI",
+      "city": "Teresina",
+      "type": "Portal",
+      "website": "http://www.180graus.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:180graus.com+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-4385"
+    },
+    {
+      "id": "pi-portal-o-dia",
+      "name": "PORTAL O DIA",
+      "uf": "PI",
+      "city": "Teresina",
+      "type": "Portal",
+      "website": "https://portalodia.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:portalodia.com+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-1451"
+    },
+    {
+      "id": "pi-jornal-meio-norte",
+      "name": "JORNAL MEIO NORTE",
+      "uf": "PI",
+      "city": "Teresina",
+      "type": "Jornal",
+      "website": "http://jornal.meionorte.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:jornal.meionorte.com+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-11737"
+    },
+    {
+      "id": "pi-oitomeia",
+      "name": "OITOMEIA",
+      "uf": "PI",
+      "city": "Teresina",
+      "type": "Blog",
+      "website": "https://www.oitomeia.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:oitomeia.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-11998"
+    },
+    {
+      "id": "rn-g1",
+      "name": "G1 RN",
+      "uf": "RN",
+      "city": "Natal",
+      "type": "Portal",
+      "website": "https://g1.globo.com/rn/rio-grande-do-norte/",
+      "rssUrl": "https://g1.globo.com/dynamo/rn/rio-grande-do-norte/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "rn-tribuna-do-norte",
+      "name": "TRIBUNA DO NORTE",
+      "uf": "RN",
+      "city": "Natal",
+      "type": "Jornal",
+      "website": "http://www.tribunadonorte.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:tribunadonorte.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-2156"
+    },
+    {
+      "id": "rn-novo-noticias",
+      "name": "NOVO NOTÍCIAS",
+      "uf": "RN",
+      "city": "Natal",
+      "type": "Portal",
+      "website": "https://novonoticias.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:novonoticias.com+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-2160"
+    },
+    {
+      "id": "rn-agora-rn",
+      "name": "AGORA RN",
+      "uf": "RN",
+      "city": "Natal",
+      "type": "Jornal",
+      "website": "https://agorarn.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:agorarn.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-12784"
+    },
+    {
+      "id": "rn-n10-rn",
+      "name": "N10 RN",
+      "uf": "RN",
+      "city": "Natal",
+      "type": "Portal",
+      "website": "https://n10rn.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:n10rn.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-20403"
+    },
+    {
+      "id": "rn-portal-da-tropical",
+      "name": "PORTAL DA TROPICAL",
+      "uf": "RN",
+      "city": "Natal",
+      "type": "Blog",
+      "website": "https://portaldatropical.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:portaldatropical.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-14971"
+    },
+    {
+      "id": "rn-agencia-saiba-mais",
+      "name": "AGÊNCIA SAIBA MAIS",
+      "uf": "RN",
+      "city": "Natal",
+      "type": "Portal",
+      "website": "https://www.saibamais.jor.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:saibamais.jor.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-16915"
+    },
+    {
+      "id": "rn-portal-noar",
+      "name": "PORTAL NOAR",
+      "uf": "RN",
+      "city": "Natal",
+      "type": "Portal",
+      "website": "https://portalnoar.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:portalnoar.com+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-2157"
+    },
+    {
+      "id": "rn-potiguar-noticias",
+      "name": "POTIGUAR NOTÍCIAS",
+      "uf": "RN",
+      "city": "Natal",
+      "type": "Portal",
+      "website": "http://www.potiguarnoticias.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:potiguarnoticias.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-12038"
+    },
+    {
+      "id": "se-g1",
+      "name": "G1 SE",
+      "uf": "SE",
+      "city": "Aracaju",
+      "type": "Portal",
+      "website": "https://g1.globo.com/se/sergipe/",
+      "rssUrl": "https://g1.globo.com/dynamo/se/sergipe/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "se-portal-infonet",
+      "name": "PORTAL INFONET",
+      "uf": "SE",
+      "city": "Aracaju",
+      "type": "Blog",
+      "website": "https://infonet.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:infonet.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-2908"
+    },
+    {
+      "id": "se-a8-se",
+      "name": "A8 SE",
+      "uf": "SE",
+      "city": "Aracaju",
+      "type": "Portal",
+      "website": "https://a8se.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:a8se.com+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-13647"
+    },
+    {
+      "id": "se-portal-f5-news",
+      "name": "PORTAL F5 NEWS",
+      "uf": "SE",
+      "city": "Aracaju",
+      "type": "Blog",
+      "website": "https://www.f5news.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:f5news.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-14754"
+    },
+    {
+      "id": "se-ajn1",
+      "name": "AJN1",
+      "uf": "SE",
+      "city": "Aracaju",
+      "type": "Portal",
+      "website": "https://ajn1.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:ajn1.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-19301"
+    },
+    {
+      "id": "se-jornal-do-dia-on-line",
+      "name": "JORNAL DO DIA ON LINE",
+      "uf": "SE",
+      "city": "Aracaju",
+      "type": "Jornal",
+      "website": "http://www.jornaldodiase.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:jornaldodiase.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-15616"
+    },
+    {
+      "id": "se-jornal-da-cidade-net",
+      "name": "JORNAL DA CIDADE.NET",
+      "uf": "SE",
+      "city": "Aracaju",
+      "type": "Jornal",
+      "website": "http://www.jornaldacidade.net/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:jornaldacidade.net+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-2917"
+    },
+    {
+      "id": "se-ne-noticias",
+      "name": "NE NOTÍCIAS",
+      "uf": "SE",
+      "city": "Aracaju",
+      "type": "Portal",
+      "website": "https://www.nenoticias.com.br/",
+      "rssUrl": "https://news.google.com/rss/search?q=site:nenoticias.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": "atlas-2913"
+    },
+    {
+      "id": "ac-g1",
+      "name": "G1 AC",
+      "uf": "AC",
+      "city": "Rio Branco",
+      "type": "Portal",
+      "website": "https://g1.globo.com/ac/acre/",
+      "rssUrl": "https://g1.globo.com/dynamo/ac/acre/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "ap-g1",
+      "name": "G1 AP",
+      "uf": "AP",
+      "city": "Macapá",
+      "type": "Portal",
+      "website": "https://g1.globo.com/ap/amapa/",
+      "rssUrl": "https://g1.globo.com/dynamo/ap/amapa/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "am-g1",
+      "name": "G1 AM",
+      "uf": "AM",
+      "city": "Manaus",
+      "type": "Portal",
+      "website": "https://g1.globo.com/am/amazonas/",
+      "rssUrl": "https://g1.globo.com/dynamo/am/amazonas/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "df-g1",
+      "name": "G1 DF",
+      "uf": "DF",
+      "city": "Brasília",
+      "type": "Portal",
+      "website": "https://g1.globo.com/df/distrito-federal/",
+      "rssUrl": "https://g1.globo.com/dynamo/distrito-federal/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "es-g1",
+      "name": "G1 ES",
+      "uf": "ES",
+      "city": "Vitória",
+      "type": "Portal",
+      "website": "https://g1.globo.com/es/espirito-santo/",
+      "rssUrl": "https://g1.globo.com/dynamo/espirito-santo/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "go-g1",
+      "name": "G1 GO",
+      "uf": "GO",
+      "city": "Goiânia",
+      "type": "Portal",
+      "website": "https://g1.globo.com/go/goias/",
+      "rssUrl": "https://g1.globo.com/dynamo/goias/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "mt-g1",
+      "name": "G1 MT",
+      "uf": "MT",
+      "city": "Cuiabá",
+      "type": "Portal",
+      "website": "https://g1.globo.com/mt/mato-grosso/",
+      "rssUrl": "https://g1.globo.com/dynamo/mato-grosso/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "ms-g1",
+      "name": "G1 MS",
+      "uf": "MS",
+      "city": "Campo Grande",
+      "type": "Portal",
+      "website": "https://g1.globo.com/ms/mato-grosso-do-sul/",
+      "rssUrl": "https://g1.globo.com/dynamo/mato-grosso-do-sul/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "mg-g1",
+      "name": "G1 MG",
+      "uf": "MG",
+      "city": "Belo Horizonte",
+      "type": "Portal",
+      "website": "https://g1.globo.com/mg/minas-gerais/",
+      "rssUrl": "https://g1.globo.com/dynamo/minas-gerais/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "pa-g1",
+      "name": "G1 PA",
+      "uf": "PA",
+      "city": "Belém",
+      "type": "Portal",
+      "website": "https://g1.globo.com/pa/para/",
+      "rssUrl": "https://g1.globo.com/dynamo/pa/para/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "pr-g1",
+      "name": "G1 PR",
+      "uf": "PR",
+      "city": "Curitiba",
+      "type": "Portal",
+      "website": "https://g1.globo.com/pr/parana/",
+      "rssUrl": "https://g1.globo.com/dynamo/parana/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "rj-g1",
+      "name": "G1 RJ",
+      "uf": "RJ",
+      "city": "Rio de Janeiro",
+      "type": "Portal",
+      "website": "https://g1.globo.com/rj/rio-de-janeiro/",
+      "rssUrl": "https://g1.globo.com/dynamo/rio-de-janeiro/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "rs-g1",
+      "name": "G1 RS",
+      "uf": "RS",
+      "city": "Porto Alegre",
+      "type": "Portal",
+      "website": "https://g1.globo.com/rs/rio-grande-do-sul/",
+      "rssUrl": "https://g1.globo.com/dynamo/rs/rio-grande-do-sul/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "ro-g1",
+      "name": "G1 RO",
+      "uf": "RO",
+      "city": "Porto Velho",
+      "type": "Portal",
+      "website": "https://g1.globo.com/ro/rondonia/",
+      "rssUrl": "https://g1.globo.com/dynamo/ro/rondonia/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "rr-g1",
+      "name": "G1 RR",
+      "uf": "RR",
+      "city": "Boa Vista",
+      "type": "Portal",
+      "website": "https://g1.globo.com/rr/roraima/",
+      "rssUrl": "https://g1.globo.com/dynamo/rr/roraima/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "sc-g1",
+      "name": "G1 SC",
+      "uf": "SC",
+      "city": "Florianópolis",
+      "type": "Portal",
+      "website": "https://g1.globo.com/sc/santa-catarina/",
+      "rssUrl": "https://g1.globo.com/dynamo/sc/santa-catarina/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "sp-g1",
+      "name": "G1 SP",
+      "uf": "SP",
+      "city": "São Paulo",
+      "type": "Portal",
+      "website": "https://g1.globo.com/sp/sao-paulo/",
+      "rssUrl": "https://g1.globo.com/dynamo/sao-paulo/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "to-g1",
+      "name": "G1 TO",
+      "uf": "TO",
+      "city": "Palmas",
+      "type": "Portal",
+      "website": "https://g1.globo.com/to/tocantins/",
+      "rssUrl": "https://g1.globo.com/dynamo/to/tocantins/rss2.xml",
+      "radarVehicleId": null
+    },
+    {
+      "id": "ac-ac24horas-com",
+      "name": "AC24Horas",
+      "uf": "AC",
+      "city": null,
+      "type": "Portal",
+      "website": "https://ac24horas.com",
+      "rssUrl": "https://news.google.com/rss/search?q=site:ac24horas.com+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "ac-contilnetnoticias-com-br",
+      "name": "ContilNet",
+      "uf": "AC",
+      "city": null,
+      "type": "Portal",
+      "website": "https://contilnetnoticias.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:contilnetnoticias.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "ap-amigodecomercio-com-br",
+      "name": "Amigo do Comércio",
+      "uf": "AP",
+      "city": null,
+      "type": "Portal",
+      "website": "https://amigodecomercio.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:amigodecomercio.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "ap-diarioaparecida-com-br",
+      "name": "Diário Amapá",
+      "uf": "AP",
+      "city": null,
+      "type": "Portal",
+      "website": "https://diarioaparecida.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:diarioaparecida.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "am-acritica-com",
+      "name": "A Crítica",
+      "uf": "AM",
+      "city": null,
+      "type": "Portal",
+      "website": "https://acritica.com",
+      "rssUrl": "https://news.google.com/rss/search?q=site:acritica.com+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "am-portaldoholanda-com-br",
+      "name": "Portal do Holanda",
+      "uf": "AM",
+      "city": null,
+      "type": "Portal",
+      "website": "https://portaldoholanda.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:portaldoholanda.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "df-correiobraziliense-com-br",
+      "name": "Correio Braziliense",
+      "uf": "DF",
+      "city": null,
+      "type": "Portal",
+      "website": "https://correiobraziliense.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:correiobraziliense.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "df-metropoles-com",
+      "name": "Metrópoles",
+      "uf": "DF",
+      "city": null,
+      "type": "Portal",
+      "website": "https://metropoles.com",
+      "rssUrl": "https://news.google.com/rss/search?q=site:metropoles.com+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "es-gazetaonline-com-br",
+      "name": "Gazeta Online",
+      "uf": "ES",
+      "city": null,
+      "type": "Portal",
+      "website": "https://gazetaonline.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:gazetaonline.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "es-folhavitoria-com-br",
+      "name": "Folha Vitória",
+      "uf": "ES",
+      "city": null,
+      "type": "Portal",
+      "website": "https://folhavitoria.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:folhavitoria.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "go-opopular-com-br",
+      "name": "O Popular",
+      "uf": "GO",
+      "city": null,
+      "type": "Portal",
+      "website": "https://opopular.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:opopular.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "go-jornalopcao-com-br",
+      "name": "Jornal Opção",
+      "uf": "GO",
+      "city": null,
+      "type": "Portal",
+      "website": "https://jornalopcao.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:jornalopcao.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "mt-midianews-com-br",
+      "name": "Mídia News",
+      "uf": "MT",
+      "city": null,
+      "type": "Portal",
+      "website": "https://midianews.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:midianews.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "mt-olhardireto-com-br",
+      "name": "Olhar Direto",
+      "uf": "MT",
+      "city": null,
+      "type": "Portal",
+      "website": "https://olhardireto.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:olhardireto.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "ms-midiamax-com-br",
+      "name": "Midiamax",
+      "uf": "MS",
+      "city": null,
+      "type": "Portal",
+      "website": "https://midiamax.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:midiamax.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "ms-campograndenews-com-br",
+      "name": "Campo Grande News",
+      "uf": "MS",
+      "city": null,
+      "type": "Portal",
+      "website": "https://campograndenews.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:campograndenews.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "mg-otempo-com-br",
+      "name": "O Tempo",
+      "uf": "MG",
+      "city": null,
+      "type": "Portal",
+      "website": "https://otempo.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:otempo.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "mg-em-com-br",
+      "name": "Estado de Minas",
+      "uf": "MG",
+      "city": null,
+      "type": "Portal",
+      "website": "https://em.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:em.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "pa-orm-com-br",
+      "name": "ORM News",
+      "uf": "PA",
+      "city": null,
+      "type": "Portal",
+      "website": "https://orm.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:orm.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "pa-diarioonline-com-br",
+      "name": "Diário Online",
+      "uf": "PA",
+      "city": null,
+      "type": "Portal",
+      "website": "https://diarioonline.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:diarioonline.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "pr-gazetadopovo-com-br",
+      "name": "Gazeta do Povo",
+      "uf": "PR",
+      "city": null,
+      "type": "Portal",
+      "website": "https://gazetadopovo.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:gazetadopovo.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "pr-bemparana-com-br",
+      "name": "Bem Paraná",
+      "uf": "PR",
+      "city": null,
+      "type": "Portal",
+      "website": "https://bemparana.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:bemparana.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "rj-extra-globo-com",
+      "name": "Extra",
+      "uf": "RJ",
+      "city": null,
+      "type": "Portal",
+      "website": "https://extra.globo.com",
+      "rssUrl": "https://news.google.com/rss/search?q=site:extra.globo.com+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "rj-odia-ig-com-br",
+      "name": "O Dia",
+      "uf": "RJ",
+      "city": null,
+      "type": "Portal",
+      "website": "https://odia.ig.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:odia.ig.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "rs-gauchazh-clicrbs-com-br",
+      "name": "GaúchaZH",
+      "uf": "RS",
+      "city": null,
+      "type": "Portal",
+      "website": "https://gauchazh.clicrbs.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:gauchazh.clicrbs.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "rs-correiodopovo-com-br",
+      "name": "Correio do Povo",
+      "uf": "RS",
+      "city": null,
+      "type": "Portal",
+      "website": "https://correiodopovo.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:correiodopovo.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "ro-rondoniaovivo-com",
+      "name": "Rondônia Ao Vivo",
+      "uf": "RO",
+      "city": null,
+      "type": "Portal",
+      "website": "https://rondoniaovivo.com",
+      "rssUrl": "https://news.google.com/rss/search?q=site:rondoniaovivo.com+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "ro-diariodaamazonia-com-br",
+      "name": "Diário da Amazônia",
+      "uf": "RO",
+      "city": null,
+      "type": "Portal",
+      "website": "https://diariodaamazonia.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:diariodaamazonia.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "rr-folhabv-com-br",
+      "name": "Folha de Boa Vista",
+      "uf": "RR",
+      "city": null,
+      "type": "Portal",
+      "website": "https://folhabv.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:folhabv.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "rr-roraimaemtempo-com",
+      "name": "Roraima em Tempo",
+      "uf": "RR",
+      "city": null,
+      "type": "Portal",
+      "website": "https://roraimaemtempo.com",
+      "rssUrl": "https://news.google.com/rss/search?q=site:roraimaemtempo.com+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "sc-nsctotal-com-br",
+      "name": "NSC Total",
+      "uf": "SC",
+      "city": null,
+      "type": "Portal",
+      "website": "https://nsctotal.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:nsctotal.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "sc-ndmais-com-br",
+      "name": "ND Mais",
+      "uf": "SC",
+      "city": null,
+      "type": "Portal",
+      "website": "https://ndmais.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:ndmais.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "sp-folha-uol-com-br",
+      "name": "Folha de S.Paulo",
+      "uf": "SP",
+      "city": null,
+      "type": "Portal",
+      "website": "https://folha.uol.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:folha.uol.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "sp-estadao-com-br",
+      "name": "Estadão",
+      "uf": "SP",
+      "city": null,
+      "type": "Portal",
+      "website": "https://estadao.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:estadao.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "sp-g1-globo-com-sp",
+      "name": "G1 SP (Google)",
+      "uf": "SP",
+      "city": null,
+      "type": "Portal",
+      "website": "https://g1.globo.com",
+      "rssUrl": "https://news.google.com/rss/search?q=G1%20SP%20(Google)+when:1d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "to-afnoticias-com-br",
+      "name": "AF Notícias",
+      "uf": "TO",
+      "city": null,
+      "type": "Portal",
+      "website": "https://afnoticias.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:afnoticias.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "to-conexaoto-com-br",
+      "name": "Conexão TO",
+      "uf": "TO",
+      "city": null,
+      "type": "Portal",
+      "website": "https://conexaoto.com.br",
+      "rssUrl": "https://news.google.com/rss/search?q=site:conexaoto.com.br+when:2d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "ac-gnews-estado",
+      "name": "Google News · AC",
+      "uf": "AC",
+      "city": null,
+      "type": "Agregador",
+      "website": "https://news.google.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=Acre+when:1d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "ap-gnews-estado",
+      "name": "Google News · AP",
+      "uf": "AP",
+      "city": null,
+      "type": "Agregador",
+      "website": "https://news.google.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=Amap%C3%A1+when:1d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "am-gnews-estado",
+      "name": "Google News · AM",
+      "uf": "AM",
+      "city": null,
+      "type": "Agregador",
+      "website": "https://news.google.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=Amazonas+when:1d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "df-gnews-estado",
+      "name": "Google News · DF",
+      "uf": "DF",
+      "city": null,
+      "type": "Agregador",
+      "website": "https://news.google.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=Bras%C3%ADlia%20OR%20%22Distrito%20Federal%22+when:1d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "es-gnews-estado",
+      "name": "Google News · ES",
+      "uf": "ES",
+      "city": null,
+      "type": "Agregador",
+      "website": "https://news.google.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=%22Esp%C3%ADrito%20Santo%22+when:1d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "go-gnews-estado",
+      "name": "Google News · GO",
+      "uf": "GO",
+      "city": null,
+      "type": "Agregador",
+      "website": "https://news.google.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=Goi%C3%A1s+when:1d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "mt-gnews-estado",
+      "name": "Google News · MT",
+      "uf": "MT",
+      "city": null,
+      "type": "Agregador",
+      "website": "https://news.google.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=%22Mato%20Grosso%22%20-Sul+when:1d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "ms-gnews-estado",
+      "name": "Google News · MS",
+      "uf": "MS",
+      "city": null,
+      "type": "Agregador",
+      "website": "https://news.google.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=%22Mato%20Grosso%20do%20Sul%22+when:1d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "mg-gnews-estado",
+      "name": "Google News · MG",
+      "uf": "MG",
+      "city": null,
+      "type": "Agregador",
+      "website": "https://news.google.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=%22Minas%20Gerais%22+when:1d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "pa-gnews-estado",
+      "name": "Google News · PA",
+      "uf": "PA",
+      "city": null,
+      "type": "Agregador",
+      "website": "https://news.google.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=Par%C3%A1%20-Para%C3%ADba+when:1d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "pr-gnews-estado",
+      "name": "Google News · PR",
+      "uf": "PR",
+      "city": null,
+      "type": "Agregador",
+      "website": "https://news.google.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=Paran%C3%A1+when:1d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "rj-gnews-estado",
+      "name": "Google News · RJ",
+      "uf": "RJ",
+      "city": null,
+      "type": "Agregador",
+      "website": "https://news.google.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=%22Rio%20de%20Janeiro%22+when:1d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "rs-gnews-estado",
+      "name": "Google News · RS",
+      "uf": "RS",
+      "city": null,
+      "type": "Agregador",
+      "website": "https://news.google.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=%22Rio%20Grande%20do%20Sul%22+when:1d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "ro-gnews-estado",
+      "name": "Google News · RO",
+      "uf": "RO",
+      "city": null,
+      "type": "Agregador",
+      "website": "https://news.google.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=Rond%C3%B4nia+when:1d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "rr-gnews-estado",
+      "name": "Google News · RR",
+      "uf": "RR",
+      "city": null,
+      "type": "Agregador",
+      "website": "https://news.google.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=Roraima+when:1d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "sc-gnews-estado",
+      "name": "Google News · SC",
+      "uf": "SC",
+      "city": null,
+      "type": "Agregador",
+      "website": "https://news.google.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=%22Santa%20Catarina%22+when:1d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "sp-gnews-estado",
+      "name": "Google News · SP",
+      "uf": "SP",
+      "city": null,
+      "type": "Agregador",
+      "website": "https://news.google.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=%22S%C3%A3o%20Paulo%22+when:1d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    },
+    {
+      "id": "to-gnews-estado",
+      "name": "Google News · TO",
+      "uf": "TO",
+      "city": null,
+      "type": "Agregador",
+      "website": "https://news.google.com/",
+      "rssUrl": "https://news.google.com/rss/search?q=Tocantins+when:1d&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+      "radarVehicleId": null
+    }
+  ]
+}

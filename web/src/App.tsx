@@ -67,25 +67,43 @@ const PREF_THEMES = [
 
 const UF_KEY = "farol_uf";
 
-const NE_UFS = [
+const BR_UFS = [
+  { uf: "AC", name: "Acre" },
   { uf: "AL", name: "Alagoas" },
+  { uf: "AP", name: "Amapá" },
+  { uf: "AM", name: "Amazonas" },
   { uf: "BA", name: "Bahia" },
   { uf: "CE", name: "Ceará" },
+  { uf: "DF", name: "Distrito Federal" },
+  { uf: "ES", name: "Espírito Santo" },
+  { uf: "GO", name: "Goiás" },
   { uf: "MA", name: "Maranhão" },
+  { uf: "MT", name: "Mato Grosso" },
+  { uf: "MS", name: "Mato Grosso do Sul" },
+  { uf: "MG", name: "Minas Gerais" },
+  { uf: "PA", name: "Pará" },
   { uf: "PB", name: "Paraíba" },
+  { uf: "PR", name: "Paraná" },
   { uf: "PE", name: "Pernambuco" },
   { uf: "PI", name: "Piauí" },
+  { uf: "RJ", name: "Rio de Janeiro" },
   { uf: "RN", name: "Rio Grande do Norte" },
+  { uf: "RS", name: "Rio Grande do Sul" },
+  { uf: "RO", name: "Rondônia" },
+  { uf: "RR", name: "Roraima" },
+  { uf: "SC", name: "Santa Catarina" },
+  { uf: "SP", name: "São Paulo" },
   { uf: "SE", name: "Sergipe" },
+  { uf: "TO", name: "Tocantins" },
 ];
 
 function readUf() {
   if (typeof window === "undefined") return "PE";
   const q = new URLSearchParams(window.location.search).get("uf");
-  if (q && NE_UFS.some((x) => x.uf === q.toUpperCase())) return q.toUpperCase();
+  if (q && BR_UFS.some((x) => x.uf === q.toUpperCase())) return q.toUpperCase();
   try {
     const saved = localStorage.getItem(UF_KEY);
-    if (saved && NE_UFS.some((x) => x.uf === saved)) return saved;
+    if (saved && BR_UFS.some((x) => x.uf === saved)) return saved;
   } catch {
     /* ignore */
   }
@@ -279,19 +297,21 @@ export default function App() {
     }
   };
 
-  const runIngest = async () => {
+  const runIngest = async (all = false) => {
     setBusy(true);
     setError(null);
     try {
       const r = await fetch("/api/ingest/run", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ uf }),
+        body: JSON.stringify(all ? { all: true } : { uf }),
       });
       const j = await r.json();
       if (!r.ok) throw new Error(j.error || r.statusText);
       setFlash(
-        `Coleta: ${j.inserted} novas · ${j.skipped} já existiam · ${j.errors} erros${j.alerts ? ` · ${j.alerts} alertas` : ""}`
+        all
+          ? `Brasil (${j.ufs} UFs): ${j.inserted} novas · ${j.skipped} já · ${j.errors} erros`
+          : `Coleta: ${j.inserted} novas · ${j.skipped} já existiam · ${j.errors} erros${j.alerts ? ` · ${j.alerts} alertas` : ""}`
       );
       await selectDay(day);
       await loadAlerts();
@@ -438,7 +458,7 @@ export default function App() {
         <header className="consumer-top">
           <div>
             <p className="brand">Farol</p>
-            <p className="tag">Imprensa do Nordeste no seu celular</p>
+            <p className="tag">Imprensa do Brasil no seu celular</p>
           </div>
           <label className="uf-pick">
             <span>Estado</span>
@@ -447,7 +467,7 @@ export default function App() {
               onChange={(e) => changeUf(e.target.value)}
               aria-label="Estado"
             >
-              {NE_UFS.map((x) => (
+              {BR_UFS.map((x) => (
                 <option key={x.uf} value={x.uf}>
                   {x.uf} — {x.name}
                 </option>
@@ -622,7 +642,7 @@ export default function App() {
           </section>
         )}
 
-        <footer className="foot consumer-foot">Farol · Nordeste</footer>
+        <footer className="foot consumer-foot">Farol · Brasil</footer>
       </div>
     );
   }
@@ -651,7 +671,7 @@ export default function App() {
           </div>
           <div className="kpi">
             <span>Sprint</span>
-                <strong>{meta?.sprint ?? 7}</strong>
+                <strong>{meta?.sprint ?? 8}</strong>
           </div>
         </div>
       </header>
@@ -668,7 +688,7 @@ export default function App() {
               <label className="uf-pick compact">
                 <span>UF</span>
                 <select value={uf} onChange={(e) => changeUf(e.target.value)} aria-label="UF">
-                  {NE_UFS.map((x) => (
+                  {BR_UFS.map((x) => (
                     <option key={x.uf} value={x.uf}>
                       {x.uf}
                     </option>
@@ -691,8 +711,11 @@ export default function App() {
               Ontem
             </button>
           </div>
-          <button type="button" className="btn" onClick={runIngest} disabled={busy}>
-            {busy ? "Coletando…" : "Coletar agora"}
+          <button type="button" className="btn" onClick={() => runIngest(false)} disabled={busy}>
+            {busy ? "Coletando…" : "Coletar UF"}
+          </button>
+          <button type="button" className="btn ghost" onClick={() => runIngest(true)} disabled={busy}>
+            Coletar Brasil
           </button>
           <a className="btn ghost" href="/">
             Ver app

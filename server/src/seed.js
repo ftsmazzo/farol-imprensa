@@ -1,13 +1,15 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const SEED_FILES = ["sources-ne-v1.json", "sources-pe-v1.json"];
+const SEED_FILES = ["sources-br-v1.json", "sources-ne-v1.json", "sources-pe-v1.json"];
 
 export async function seedSources(pool, root) {
   const dataDir = path.join(root, "data");
   let files = SEED_FILES.map((f) => path.join(dataDir, f)).filter((p) => fs.existsSync(p));
-  // Prefer NE pack (já inclui PE curated)
-  if (fs.existsSync(path.join(dataDir, "sources-ne-v1.json"))) {
+  // Prefer Brasil pack (inclui NE + demais UFs)
+  if (fs.existsSync(path.join(dataDir, "sources-br-v1.json"))) {
+    files = [path.join(dataDir, "sources-br-v1.json")];
+  } else if (fs.existsSync(path.join(dataDir, "sources-ne-v1.json"))) {
     files = [path.join(dataDir, "sources-ne-v1.json")];
   }
   if (!files.length) {

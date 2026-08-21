@@ -143,6 +143,21 @@ Depois do 5 = MVP utilizável. Escala UF/Brasil só após calibrar PE.
 
 ---
 
+## Sprint 8 — Brasil 27 UFs
+
+**Objetivo:** cobrir todas as unidades federativas, não só o Nordeste.
+
+**Entregáveis**
+- [x] Seed `sources-br-v1.json` (NE Radar + G1 estadual + portais + Google News)
+- [x] `BR_UFS` (27) na API e no seletor do app
+- [x] Admin: coletar UF ou coletar Brasil inteiro (`POST /api/ingest/run` com `{ all: true }`)
+
+**DoD:** seletor com SP/RJ/MG/…; coleta de UF nova popula digest.
+
+**Fora:** densificar fontes fora do NE ao nível do Radar Nordeste; capital vs interior.
+
+---
+
 ## Cadência
 
 1. Começa sprint → só os itens do sprint  
