@@ -32,18 +32,34 @@ export function canInstallPwa() {
 export async function subscribePush(themes: string[], keywords: string[], uf = "PE") {
   const reg = await registerServiceWorker();
   if (!reg) throw new Error("Service Worker indisponível neste navegador");
-  if (!("PushManager" in window)) throw new Error("Web Push não suportado neste navegador");
+  if (!("PushManager" in window)) {
+    throw new Error(
+      "Web Push não disponível aqui. No iPhone: adicione à Tela de Início e abra pelo ícone (iOS 16.4+)."
+    );
+  }
 
   const permission = await Notification.requestPermission();
-  if (permission !== "granted") throw new Error("Permissão de notificação negada");
+  if (permission !== "granted") {
+    throw new Error("Permissão de notificação negada nas configurações do aparelho.");
+  }
 
   const vapid = await fetch("/api/push/vapid-public-key").then((r) => r.json());
   if (!vapid.publicKey) throw new Error(vapid.error || "VAPID ausente");
 
-  const sub = await reg.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: urlBase64ToUint8Array(vapid.publicKey),
-  });
+  let sub;
+  try {
+    sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(vapid.publicKey),
+    });
+  } catch (err) {
+    const msg = String((err as Error)?.message || err);
+    throw new Error(
+      msg.includes("push service") || msg.includes("denied")
+        ? "Falha ao registrar push. No iPhone use o app da Tela de Início e permita notificações."
+        : msg
+    );
+  }
   const json = sub.toJSON();
   const body = {
     deviceId: getDeviceId(),

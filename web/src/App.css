@@ -78,11 +78,28 @@ body {
 }
 
 .consumer-nav {
-  display: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+  padding: 0.3rem;
+  border: 1px solid var(--line);
+  background: rgba(11, 18, 32, 0.55);
 }
 
 .nav {
-  display: none;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 0.7rem 0.5rem;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.nav.on {
+  background: rgba(240, 180, 41, 0.16);
+  color: var(--beam);
+  font-weight: 600;
 }
 
 .consumer-hero {
@@ -195,6 +212,14 @@ body {
   margin: 0 0 0.75rem;
   color: var(--muted);
   font-size: 0.9rem;
+}
+
+.prefs-hint {
+  margin: 1.15rem 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  opacity: 0.9;
 }
 
 .consumer-foot {

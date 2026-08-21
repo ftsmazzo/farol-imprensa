@@ -1,5 +1,11 @@
 import { useEffect, useState, type FormEvent } from "react";
 import "./App.css";
+import {
+  getDeviceId,
+  subscribePush,
+  testPush,
+  unsubscribePush,
+} from "./pushClient";
 
 type Meta = {
   sprint?: number;
@@ -96,6 +102,7 @@ function fmtWhen(iso: string | null | undefined) {
 
 export default function App() {
   const [admin] = useState(readAdminMode);
+  const [tab, setTab] = useState<"ler" | "alertas">("ler");
   const [meta, setMeta] = useState<Meta | null>(null);
   const [digest, setDigest] = useState<Digest | null>(null);
   const [anchors, setAnchors] = useState<{ today: string; yesterday: string } | null>(null);
@@ -110,6 +117,9 @@ export default function App() {
   const [events, setEvents] = useState<AlertEvent[]>([]);
   const [ruleName, setRuleName] = useState("");
   const [ruleKeywords, setRuleKeywords] = useState("");
+  const [prefThemes, setPrefThemes] = useState<string[]>(["política"]);
+  const [prefPeople, setPrefPeople] = useState("");
+  const [pushOn, setPushOn] = useState(false);
 
   const loadMeta = () => fetch("/api/meta").then((r) => r.json()).then(setMeta);
 
@@ -148,7 +158,6 @@ export default function App() {
   };
 
   useEffect(() => {
-    // limpa flag antiga que prendia o celular no modo equipe
     try {
       localStorage.removeItem("farol_admin");
     } catch {
@@ -156,13 +165,25 @@ export default function App() {
     }
 
     const boot = async () => {
-      const jobs: Promise<unknown>[] = [fetch("/api/digest?uf=PE").then((r) => r.json())];
-      if (admin) {
-        jobs.unshift(loadMeta());
-        jobs.push(loadAlerts());
-      }
+      const jobs: Promise<unknown>[] = [
+        fetch("/api/meta").then((r) => r.json()).then(setMeta),
+        fetch("/api/digest?uf=PE").then((r) => r.json()),
+        fetch(`/api/push/me?deviceId=${encodeURIComponent(getDeviceId())}`)
+          .then((r) => r.json())
+          .then((me) => {
+            if (me?.active) {
+              setPushOn(true);
+              if (Array.isArray(me.themes) && me.themes.length) setPrefThemes(me.themes);
+              if (Array.isArray(me.keywords) && me.keywords.length) {
+                setPrefPeople(me.keywords.join(", "));
+              }
+            }
+          })
+          .catch(() => {}),
+      ];
+      if (admin) jobs.push(loadAlerts());
       const results = await Promise.all(jobs);
-      const base = (admin ? results[1] : results[0]) as Digest;
+      const base = results[1] as Digest;
       if (base?.today && base?.yesterday) {
         setAnchors({ today: base.today, yesterday: base.yesterday });
       }
@@ -294,6 +315,66 @@ export default function App() {
     }
   };
 
+  const togglePrefTheme = (t: string) => {
+    setPrefThemes((prev) => (prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]));
+  };
+
+  const savePushPrefs = async () => {
+    setBusy(true);
+    setError(null);
+    setFlash(null);
+    try {
+      if (!prefThemes.length && !prefPeople.trim()) {
+        throw new Error("Escolha ao menos 1 tema ou 1 pessoa/palavra.");
+      }
+      const keywords = prefPeople
+        .split(/[,;|/]+/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+      await subscribePush(prefThemes, keywords, "PE");
+      setPushOn(true);
+      setFlash("Alertas ativados neste aparelho.");
+    } catch (err) {
+      setError(String(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const stopPush = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      await unsubscribePush();
+      setPushOn(false);
+      setFlash("Alertas desativados neste aparelho.");
+    } catch (err) {
+      setError(String(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const sendTestPush = async () => {
+    setBusy(true);
+    setError(null);
+    setFlash(null);
+    try {
+      const j = await testPush();
+      if (j.dispatch?.ok && j.dispatch?.status === "sent") {
+        setFlash("Push de teste enviado — olhe as notificações do sistema.");
+      } else if (j.dispatch?.queued) {
+        setFlash("Push enfileirado (servidor sem VAPID).");
+      } else {
+        setFlash(`Push teste: ${j.dispatch?.error || j.dispatch?.status || "ok"}`);
+      }
+    } catch (err) {
+      setError(String(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const items = digest?.items || [];
 
   if (!admin) {
@@ -302,76 +383,177 @@ export default function App() {
         <div className="sky" aria-hidden />
 
         <header className="consumer-top">
-          <p className="brand">Farol</p>
-          <p className="tag">O que a imprensa de PE publicou</p>
+          <div>
+            <p className="brand">Farol</p>
+            <p className="tag">Imprensa de PE no seu celular</p>
+          </div>
+          <nav className="consumer-nav" aria-label="Navegação">
+            <button
+              type="button"
+              className={tab === "ler" ? "nav on" : "nav"}
+              onClick={() => {
+                setTab("ler");
+                setError(null);
+              }}
+            >
+              Ler
+            </button>
+            <button
+              type="button"
+              className={tab === "alertas" ? "nav on" : "nav"}
+              onClick={() => {
+                setTab("alertas");
+                setError(null);
+              }}
+            >
+              Meus alertas
+            </button>
+          </nav>
         </header>
 
-        <section className="consumer-hero">
-          <div className="day-tabs" role="tablist" aria-label="Dia">
-            <button
-              type="button"
-              className={day === "today" ? "tab on" : "tab"}
-              onClick={() => selectDay("today")}
-            >
-              Hoje
-            </button>
-            <button
-              type="button"
-              className={day === "yesterday" ? "tab on" : "tab"}
-              onClick={() => selectDay("yesterday")}
-            >
-              Ontem
-            </button>
-          </div>
-          <h1>
-            {digest?.label || "Hoje"}
-            <span> · PE</span>
-          </h1>
-          <p>{digest?.count ?? 0} matérias</p>
-        </section>
-
-        <div className="theme-tabs soft" role="tablist" aria-label="Tema">
-          {["todos", ...PREF_THEMES].map((t) => (
-            <button
-              key={t}
-              type="button"
-              className={theme === t ? "tab on" : "tab"}
-              onClick={() => selectTheme(t)}
-            >
-              {t === "todos" ? "Tudo" : t}
-            </button>
-          ))}
-        </div>
-
         {error && <p className="err">{error}</p>}
+        {flash && <p className="note">{flash}</p>}
 
-        <section className="board consumer-board">
-          {items.length === 0 ? (
-            <div className="empty">
-              <p className="empty-title">Nada por aqui ainda</p>
-              <p>Volte mais tarde ou veja Ontem.</p>
-            </div>
-          ) : (
-            <ul className="feed">
-              {items.map((it) => (
-                <li key={it.id} className="row">
-                  <time dateTime={it.publishedAt || it.fetchedAt || undefined}>
-                    {fmtTime(it.publishedAt || it.fetchedAt)}
-                  </time>
-                  <div className="row-body">
-                    <a href={it.url} target="_blank" rel="noreferrer">
-                      {it.title}
-                    </a>
-                    <span className="meta-line">
-                      <span className="vehicle">{it.source || "Fonte"}</span>
-                      {it.theme ? <span className="theme-tag">{it.theme}</span> : null}
-                    </span>
-                  </div>
-                </li>
+        {tab === "ler" ? (
+          <>
+            <section className="consumer-hero">
+              <div className="day-tabs" role="tablist" aria-label="Dia">
+                <button
+                  type="button"
+                  className={day === "today" ? "tab on" : "tab"}
+                  onClick={() => selectDay("today")}
+                >
+                  Hoje
+                </button>
+                <button
+                  type="button"
+                  className={day === "yesterday" ? "tab on" : "tab"}
+                  onClick={() => selectDay("yesterday")}
+                >
+                  Ontem
+                </button>
+              </div>
+              <h1>
+                {digest?.label || "Hoje"}
+                <span> · PE</span>
+              </h1>
+              <p>{digest?.count ?? 0} matérias</p>
+            </section>
+
+            <div className="theme-tabs soft" role="tablist" aria-label="Tema">
+              {["todos", ...PREF_THEMES].map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  className={theme === t ? "tab on" : "tab"}
+                  onClick={() => selectTheme(t)}
+                >
+                  {t === "todos" ? "Tudo" : t}
+                </button>
               ))}
-            </ul>
-          )}
-        </section>
+            </div>
+
+            <section className="board consumer-board">
+              {items.length === 0 ? (
+                <div className="empty">
+                  <p className="empty-title">Nada por aqui ainda</p>
+                  <p>Volte mais tarde ou veja Ontem.</p>
+                </div>
+              ) : (
+                <ul className="feed">
+                  {items.map((it) => (
+                    <li key={it.id} className="row">
+                      <time dateTime={it.publishedAt || it.fetchedAt || undefined}>
+                        {fmtTime(it.publishedAt || it.fetchedAt)}
+                      </time>
+                      <div className="row-body">
+                        <a href={it.url} target="_blank" rel="noreferrer">
+                          {it.title}
+                        </a>
+                        <span className="meta-line">
+                          <span className="vehicle">{it.source || "Fonte"}</span>
+                          {it.theme ? <span className="theme-tag">{it.theme}</span> : null}
+                        </span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          </>
+        ) : (
+          <section className="prefs" aria-label="Meus alertas">
+            <h1>Meus alertas</h1>
+            <p className="prefs-lead">
+              Escolha temas e pessoas. Ative o push e teste neste aparelho.
+            </p>
+
+            <p className="prefs-label">Temas</p>
+            <div className="theme-tabs" role="group" aria-label="Temas para alertar">
+              {PREF_THEMES.map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  className={prefThemes.includes(t) ? "tab on" : "tab"}
+                  onClick={() => togglePrefTheme(t)}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+
+            <p className="prefs-label">Pessoas ou palavras</p>
+            <form
+              className="prefs-form"
+              onSubmit={(e) => {
+                e.preventDefault();
+                savePushPrefs();
+              }}
+            >
+              <input
+                type="text"
+                placeholder="Ex.: Raquel Lyra, Cabrobó"
+                value={prefPeople}
+                onChange={(e) => setPrefPeople(e.target.value)}
+                aria-label="Pessoas ou palavras"
+              />
+              <button
+                type="submit"
+                className="btn"
+                disabled={busy || meta?.pushConfigured === false}
+              >
+                {busy ? "Aguarde…" : pushOn ? "Salvar e manter ativo" : "Ativar alertas"}
+              </button>
+            </form>
+
+            {meta?.pushConfigured === false && (
+              <p className="prefs-hint">Servidor sem VAPID — push indisponível no momento.</p>
+            )}
+
+            {pushOn && (
+              <div className="prefs-active">
+                <p>
+                  Ativo
+                  {prefThemes.length ? ` · ${prefThemes.join(", ")}` : ""}
+                  {prefPeople.trim() ? ` · ${prefPeople}` : ""}
+                </p>
+                <div className="actions">
+                  <button type="button" className="btn" onClick={sendTestPush} disabled={busy}>
+                    Testar push
+                  </button>
+                  <button type="button" className="btn ghost" onClick={stopPush} disabled={busy}>
+                    Desativar
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <p className="prefs-hint">
+              No iPhone: adicione o Farol à Tela de Início (Compartilhar → Tela de Início), abra pelo
+              ícone e ative os alertas de lá. Safari solto no site costuma bloquear push.
+            </p>
+          </section>
+        )}
 
         <footer className="foot consumer-foot">Farol · Pernambuco</footer>
       </div>
