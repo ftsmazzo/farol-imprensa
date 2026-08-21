@@ -824,9 +824,18 @@ app.get("/api/digest", async (req, res) => {
 const publicCandidates = [path.join(root, "public"), path.join(root, "web", "dist")];
 const publicDir = publicCandidates.find((p) => fs.existsSync(p));
 if (publicDir) {
-  app.use(express.static(publicDir));
+  app.use(
+    express.static(publicDir, {
+      setHeaders(res, filePath) {
+        if (filePath.endsWith("index.html") || filePath.endsWith("sw.js")) {
+          res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        }
+      },
+    })
+  );
   app.get(/.*/, (req, res, next) => {
     if (req.path.startsWith("/api/")) return next();
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
     res.sendFile(path.join(publicDir, "index.html"));
   });
 }

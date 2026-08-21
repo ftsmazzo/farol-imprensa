@@ -47,8 +47,10 @@ VAPID_PRIVATE_KEY=...
 VAPID_SUBJECT=mailto:farol@fabria.ia
 ```
 
-No celular: app consumidor (**Ler** / **Meus alertas**).  
+No celular o padrão é o **app consumidor** (só leitura).  
 Painel da equipe: https://farol-imprensa-web.kxryyk.easypanel.host/?admin=1
+
+Push no iPhone fica para uma etapa seguinte (Web Push no iOS exige app na Tela de Início + iOS 16.4+ e ainda é frágil).
 
 ## Local (Sprint 1)
 

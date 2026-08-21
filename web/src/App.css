@@ -78,32 +78,19 @@ body {
 }
 
 .consumer-nav {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.35rem;
-  padding: 0.3rem;
-  border: 1px solid var(--line);
-  background: rgba(11, 18, 32, 0.55);
+  display: none;
 }
 
 .nav {
-  border: 0;
-  background: transparent;
-  color: var(--muted);
-  padding: 0.7rem 0.5rem;
-  font-family: var(--font-body);
-  font-size: 0.95rem;
-  cursor: pointer;
-}
-
-.nav.on {
-  background: rgba(240, 180, 41, 0.16);
-  color: var(--beam);
-  font-weight: 600;
+  display: none;
 }
 
 .consumer-hero {
   margin-bottom: 1rem;
+}
+
+.consumer-hero .day-tabs {
+  margin-bottom: 0.85rem;
 }
 
 .consumer-hero h1 {

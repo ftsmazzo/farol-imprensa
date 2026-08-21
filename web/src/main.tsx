@@ -8,3 +8,10 @@ createRoot(document.getElementById("root")!).render(
     <App />
   </StrictMode>
 );
+
+// SW só para instalação PWA — HTML/JS não ficam presos em cache antigo
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").then((reg) => reg.update()).catch(() => {});
+  });
+}
