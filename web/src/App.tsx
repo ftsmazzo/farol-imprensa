@@ -22,6 +22,7 @@ type AlertRule = {
   name: string;
   keywords: string[];
   uf: string | null;
+  theme?: string | null;
   active: boolean;
 };
 
@@ -52,6 +53,10 @@ type Digest = {
   yesterday?: string;
   label?: string;
   count?: number;
+  total?: number;
+  page?: number;
+  pageSize?: number;
+  totalPages?: number;
   items: DigestItem[];
   note?: string | null;
 };
@@ -154,6 +159,7 @@ export default function App() {
   const [anchors, setAnchors] = useState<{ today: string; yesterday: string } | null>(null);
   const [day, setDay] = useState<"today" | "yesterday">("today");
   const [theme, setTheme] = useState("todos");
+  const [page, setPage] = useState(1);
   const [q, setQ] = useState("");
   const [qDraft, setQDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -163,6 +169,7 @@ export default function App() {
   const [events, setEvents] = useState<AlertEvent[]>([]);
   const [ruleName, setRuleName] = useState("");
   const [ruleKeywords, setRuleKeywords] = useState("");
+  const [ruleTheme, setRuleTheme] = useState("");
   const [prefThemes, setPrefThemes] = useState<string[]>(["política"]);
   const [prefPeople, setPrefPeople] = useState("");
   const [pushOn, setPushOn] = useState(false);
@@ -178,8 +185,19 @@ export default function App() {
     setEvents(Array.isArray(e) ? e : []);
   };
 
-  const digestUrl = (date: string, themeVal: string, query: string, ufVal = uf) => {
-    const params = new URLSearchParams({ uf: ufVal, date });
+  const digestUrl = (
+    date: string,
+    themeVal: string,
+    query: string,
+    ufVal = uf,
+    pageVal = 1
+  ) => {
+    const params = new URLSearchParams({
+      uf: ufVal,
+      date,
+      page: String(pageVal),
+      limit: "10",
+    });
     if (themeVal && themeVal !== "todos") params.set("theme", themeVal);
     if (query.trim()) params.set("q", query.trim());
     return `/api/digest?${params}`;
@@ -187,21 +205,25 @@ export default function App() {
 
   const loadDigest = async (
     which: "today" | "yesterday",
-    opts?: { theme?: string; q?: string; base?: Digest; uf?: string }
+    opts?: { theme?: string; q?: string; base?: Digest; uf?: string; page?: number }
   ) => {
     const themeVal = opts?.theme ?? theme;
     const query = opts?.q ?? q;
     const ufVal = opts?.uf ?? uf;
+    const pageVal = opts?.page ?? page;
     const info =
       opts?.base ||
       anchors ||
-      (await fetch(`/api/digest?uf=${ufVal}`).then((r) => r.json()));
+      (await fetch(`/api/digest?uf=${ufVal}&limit=10`).then((r) => r.json()));
     if (!anchors && info.today && info.yesterday) {
       setAnchors({ today: info.today, yesterday: info.yesterday });
     }
     const date = which === "today" ? info.today : info.yesterday;
-    const d = await fetch(digestUrl(date, themeVal, query, ufVal)).then((r) => r.json());
+    const d = await fetch(digestUrl(date, themeVal, query, ufVal, pageVal)).then((r) =>
+      r.json()
+    );
     setDigest(d);
+    if (d.page && d.page !== pageVal) setPage(d.page);
   };
 
   useEffect(() => {
@@ -251,14 +273,15 @@ export default function App() {
     setAnchors(null);
     setError(null);
     setTheme("todos");
+    setPage(1);
     setQ("");
     setQDraft("");
     try {
-      const base = await fetch(`/api/digest?uf=${u}`).then((r) => r.json());
+      const base = await fetch(`/api/digest?uf=${u}&limit=10`).then((r) => r.json());
       if (base.today && base.yesterday) {
         setAnchors({ today: base.today, yesterday: base.yesterday });
       }
-      await loadDigest(day, { uf: u, theme: "todos", q: "", base });
+      await loadDigest(day, { uf: u, theme: "todos", q: "", page: 1, base });
     } catch (e) {
       setError(String(e));
     }
@@ -266,9 +289,10 @@ export default function App() {
 
   const selectDay = async (which: "today" | "yesterday") => {
     setDay(which);
+    setPage(1);
     setError(null);
     try {
-      await loadDigest(which);
+      await loadDigest(which, { page: 1 });
       if (admin) await loadMeta();
     } catch (e) {
       setError(String(e));
@@ -277,9 +301,23 @@ export default function App() {
 
   const selectTheme = async (next: string) => {
     setTheme(next);
+    setPage(1);
     setError(null);
     try {
-      await loadDigest(day, { theme: next });
+      await loadDigest(day, { theme: next, page: 1 });
+    } catch (e) {
+      setError(String(e));
+    }
+  };
+
+  const goPage = async (next: number) => {
+    const totalPages = digest?.totalPages || 1;
+    const p = Math.min(Math.max(1, next), totalPages);
+    setPage(p);
+    setError(null);
+    try {
+      await loadDigest(day, { page: p });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (e) {
       setError(String(e));
     }
@@ -289,9 +327,10 @@ export default function App() {
     e?.preventDefault();
     const next = qDraft.trim();
     setQ(next);
+    setPage(1);
     setError(null);
     try {
-      await loadDigest(day, { q: next });
+      await loadDigest(day, { q: next, page: 1 });
     } catch (err) {
       setError(String(err));
     }
@@ -333,13 +372,29 @@ export default function App() {
           name: ruleName.trim(),
           keywords: ruleKeywords,
           uf,
+          theme: ruleTheme || null,
         }),
       });
       const j = await r.json();
       if (!r.ok) throw new Error(j.error || r.statusText);
       setRuleName("");
       setRuleKeywords("");
-      setFlash(`Regra criada: ${j.name}`);
+      setRuleTheme("");
+      setFlash(`Aviso ativo: ${j.name}`);
+      await loadAlerts();
+      await loadMeta();
+    } catch (err) {
+      setError(String(err));
+    }
+  };
+
+  const removeRule = async (id: number) => {
+    setError(null);
+    try {
+      const r = await fetch(`/api/alerts/rules/${id}`, { method: "DELETE" });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error || r.statusText);
+      setFlash("Aviso desativado.");
       await loadAlerts();
       await loadMeta();
     } catch (err) {
@@ -524,7 +579,12 @@ export default function App() {
                 {digest?.label || "Hoje"}
                 <span> · {uf}</span>
               </h1>
-              <p>{digest?.count ?? 0} matérias</p>
+              <p>
+                {digest?.total ?? digest?.count ?? 0} matérias
+                {digest?.totalPages && digest.totalPages > 1
+                  ? ` · pág. ${digest.page || 1}/${digest.totalPages}`
+                  : ""}
+              </p>
             </section>
 
             <div className="theme-tabs soft" role="tablist" aria-label="Tema">
@@ -547,24 +607,49 @@ export default function App() {
                   <p>Volte mais tarde ou veja Ontem.</p>
                 </div>
               ) : (
-                <ul className="feed">
-                  {items.map((it) => (
-                    <li key={it.id} className="row">
-                      <time dateTime={it.publishedAt || it.fetchedAt || undefined}>
-                        {fmtTime(it.publishedAt || it.fetchedAt)}
-                      </time>
-                      <div className="row-body">
-                        <a href={it.url} target="_blank" rel="noreferrer">
-                          {it.title}
-                        </a>
-                        <span className="meta-line">
-                          <span className="vehicle">{it.source || "Fonte"}</span>
-                          {it.theme ? <span className="theme-tag">{it.theme}</span> : null}
-                        </span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+                <>
+                  <ul className="feed">
+                    {items.map((it) => (
+                      <li key={it.id} className="row">
+                        <time dateTime={it.publishedAt || it.fetchedAt || undefined}>
+                          {fmtTime(it.publishedAt || it.fetchedAt)}
+                        </time>
+                        <div className="row-body">
+                          <a href={it.url} target="_blank" rel="noreferrer">
+                            {it.title}
+                          </a>
+                          <span className="meta-line">
+                            <span className="vehicle">{it.source || "Fonte"}</span>
+                            {it.theme ? <span className="theme-tag">{it.theme}</span> : null}
+                          </span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                  {(digest?.totalPages || 1) > 1 && (
+                    <nav className="pager" aria-label="Páginas">
+                      <button
+                        type="button"
+                        className="btn ghost"
+                        disabled={(digest?.page || 1) <= 1}
+                        onClick={() => goPage((digest?.page || 1) - 1)}
+                      >
+                        Anterior
+                      </button>
+                      <span>
+                        {digest?.page || 1} / {digest?.totalPages || 1}
+                      </span>
+                      <button
+                        type="button"
+                        className="btn ghost"
+                        disabled={(digest?.page || 1) >= (digest?.totalPages || 1)}
+                        onClick={() => goPage((digest?.page || 1) + 1)}
+                      >
+                        Próximas
+                      </button>
+                    </nav>
+                  )}
+                </>
               )}
             </section>
           </>
@@ -659,7 +744,7 @@ export default function App() {
         <div className="kpis">
           <div className="kpi">
             <span>No dia</span>
-            <strong>{digest?.count ?? 0}</strong>
+            <strong>{digest?.total ?? digest?.count ?? 0}</strong>
           </div>
           <div className="kpi">
             <span>Fontes</span>
@@ -725,7 +810,7 @@ export default function App() {
 
       <section className="filters" aria-label="Filtros">
         <div className="theme-tabs" role="tablist" aria-label="Tema">
-          {["todos", ...PREF_THEMES, "outros"].map((t) => (
+          {["todos", ...PREF_THEMES].map((t) => (
             <button
               key={t}
               type="button"
@@ -758,95 +843,159 @@ export default function App() {
           <div className="empty">
             <p className="empty-title">Sem matérias neste filtro</p>
             <p>
-              Ajuste busca/tema ou rode <strong>Coletar agora</strong>.
+              Ajuste busca/tema ou rode <strong>Coletar UF</strong>.
             </p>
           </div>
         ) : (
-          <ul className="feed">
-            {items.map((it) => (
-              <li key={it.id} className="row">
-                <time dateTime={it.publishedAt || it.fetchedAt || undefined}>
-                  {fmtTime(it.publishedAt || it.fetchedAt)}
-                </time>
-                <div className="row-body">
-                  <a href={it.url} target="_blank" rel="noreferrer">
-                    {it.title}
-                  </a>
-                  <span className="meta-line">
-                    <span className="vehicle">{it.source || "Fonte"}</span>
-                    {it.theme ? <span className="theme-tag">{it.theme}</span> : null}
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ul>
+          <>
+            <ul className="feed">
+              {items.map((it) => (
+                <li key={it.id} className="row">
+                  <time dateTime={it.publishedAt || it.fetchedAt || undefined}>
+                    {fmtTime(it.publishedAt || it.fetchedAt)}
+                  </time>
+                  <div className="row-body">
+                    <a href={it.url} target="_blank" rel="noreferrer">
+                      {it.title}
+                    </a>
+                    <span className="meta-line">
+                      <span className="vehicle">{it.source || "Fonte"}</span>
+                      {it.theme ? <span className="theme-tag">{it.theme}</span> : null}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            {(digest?.totalPages || 1) > 1 && (
+              <nav className="pager" aria-label="Páginas">
+                <button
+                  type="button"
+                  className="btn ghost"
+                  disabled={(digest?.page || 1) <= 1}
+                  onClick={() => goPage((digest?.page || 1) - 1)}
+                >
+                  Anterior
+                </button>
+                <span>
+                  {digest?.page || 1} / {digest?.totalPages || 1} · {digest?.total || 0}{" "}
+                  matérias
+                </span>
+                <button
+                  type="button"
+                  className="btn ghost"
+                  disabled={(digest?.page || 1) >= (digest?.totalPages || 1)}
+                  onClick={() => goPage((digest?.page || 1) + 1)}
+                >
+                  Próximas
+                </button>
+              </nav>
+            )}
+          </>
         )}
       </section>
 
-      <section className="alerts" aria-label="Alertas equipe">
+      <section className="alerts" aria-label="Avisos da equipe">
         <div className="alerts-head">
           <div>
-            <h2>Alertas (equipe)</h2>
+            <h2>Avisos da equipe</h2>
             <p>
-              {meta?.alertWebhookConfigured
-                ? "Webhook n8n ativo."
-                : "Configure N8N_ALERT_WEBHOOK no Easypanel."}
+              Dispara no n8n (WhatsApp) quando uma palavra-chave aparecer na imprensa de{" "}
+              <strong>{uf}</strong>. Prefira nomes próprios ou termos específicos.
+              {meta?.alertWebhookConfigured ? "" : " Configure N8N_ALERT_WEBHOOK no Easypanel."}
             </p>
-          </div>
-          <div className="actions">
-            <button type="button" className="btn ghost" onClick={rematchAlerts} disabled={busy}>
-              Rematch
-            </button>
-            <button type="button" className="btn ghost" onClick={testAlert} disabled={busy}>
-              Testar n8n
-            </button>
           </div>
         </div>
 
-        <form className="rule-form" onSubmit={createRule}>
-          <input
-            type="text"
-            placeholder="Nome da regra"
-            value={ruleName}
-            onChange={(e) => setRuleName(e.target.value)}
-            required
-          />
-          <input
-            type="text"
-            placeholder="Keywords (vírgula)"
-            value={ruleKeywords}
-            onChange={(e) => setRuleKeywords(e.target.value)}
-            required
-          />
+        <form className="rule-form stacked" onSubmit={createRule}>
+          <label>
+            Nome do aviso
+            <input
+              type="text"
+              placeholder="Ex.: Governo SP"
+              value={ruleName}
+              onChange={(e) => setRuleName(e.target.value)}
+              required
+            />
+          </label>
+          <label>
+            Palavras (vírgula)
+            <input
+              type="text"
+              placeholder="Ex.: Tarcísio, Sabesp"
+              value={ruleKeywords}
+              onChange={(e) => setRuleKeywords(e.target.value)}
+              required
+            />
+          </label>
+          <label>
+            Tema (opcional)
+            <select
+              value={ruleTheme}
+              onChange={(e) => setRuleTheme(e.target.value)}
+              aria-label="Tema do aviso"
+            >
+              <option value="">Qualquer tema</option>
+              {PREF_THEMES.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          </label>
           <button type="submit" className="btn">
-            Criar regra
+            Criar aviso
           </button>
         </form>
 
-        {rules.length > 0 && (
-          <div className="source-strip">
+        {rules.length === 0 ? (
+          <p className="alerts-empty">Nenhum aviso ativo. Crie um acima.</p>
+        ) : (
+          <ul className="rule-list">
             {rules.map((r) => (
-              <span key={r.id} className="chip">
-                {r.name} <b>{(r.keywords || []).join(", ")}</b>
-              </span>
-            ))}
-          </div>
-        )}
-
-        {events.length > 0 && (
-          <ul className="event-list">
-            {events.map((ev) => (
-              <li key={ev.id}>
-                <span className={`st ${ev.status}`}>{ev.status}</span>
-                <a href={ev.url} target="_blank" rel="noreferrer">
-                  {ev.title}
-                </a>
-                <span className="vehicle">
-                  {ev.ruleName} · “{ev.matchedOn}” · {ev.source || "Fonte"}
-                </span>
+              <li key={r.id}>
+                <div>
+                  <strong>{r.name}</strong>
+                  <span>
+                    {(r.keywords || []).join(", ")}
+                    {r.theme ? ` · ${r.theme}` : ""}
+                    {r.uf ? ` · ${r.uf}` : ""}
+                  </span>
+                </div>
+                <button type="button" className="btn ghost tiny" onClick={() => removeRule(r.id)}>
+                  Desativar
+                </button>
               </li>
             ))}
           </ul>
+        )}
+
+        <div className="alerts-tools">
+          <span>Ferramentas</span>
+          <button type="button" className="btn ghost" onClick={rematchAlerts} disabled={busy}>
+            Reprocessar base
+          </button>
+          <button type="button" className="btn ghost" onClick={testAlert} disabled={busy}>
+            Testar n8n
+          </button>
+        </div>
+
+        {events.length > 0 && (
+          <>
+            <h3 className="alerts-sub">Últimos disparos</h3>
+            <ul className="event-list">
+              {events.map((ev) => (
+                <li key={ev.id}>
+                  <span className={`st ${ev.status}`}>{ev.status}</span>
+                  <a href={ev.url} target="_blank" rel="noreferrer">
+                    {ev.title}
+                  </a>
+                  <span className="vehicle">
+                    {ev.ruleName} · “{ev.matchedOn}” · {ev.source || "Fonte"}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </>
         )}
       </section>
 

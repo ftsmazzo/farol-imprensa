@@ -158,6 +158,20 @@ Depois do 5 = MVP utilizável. Escala UF/Brasil só após calibrar PE.
 
 ---
 
+## Sprint 9 — Digest limpo + alertas claros
+
+**Objetivo:** leitura sem duplicata Google, só temas reais, páginas de 10, avisos da equipe mais claros.
+
+**Entregáveis**
+- [x] Deduplicação por título (prioriza veículo original vs Google News)
+- [x] Remover filtro/listagem “outros”; “Tudo” = temas selecionáveis
+- [x] Paginação `limit=10` no digest (app + admin)
+- [x] Avisos da equipe: form com tema, lista com desativar, ferramentas secundárias
+
+**DoD:** mesma matéria de 2 Google some; Folha/G1 oficial fica; feed em páginas de 10.
+
+---
+
 ## Cadência
 
 1. Começa sprint → só os itens do sprint  

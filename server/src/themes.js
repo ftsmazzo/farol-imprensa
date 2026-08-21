@@ -7,8 +7,10 @@ export const THEMES = [
   "saúde",
   "educação",
   "meio ambiente",
-  "outros",
 ];
+
+/** Temas selecionáveis no app (sem "outros"). */
+export const SELECTABLE_THEMES = THEMES;
 
 const RULES = [
   {

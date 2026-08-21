@@ -21,6 +21,7 @@ import {
 } from "./push.js";
 import { runIngest } from "./ingest.js";
 import { seedSources } from "./seed.js";
+import { dedupePreferOriginal } from "./dedupe.js";
 import { THEMES, classifyTheme } from "./themes.js";
 import { BR_UFS, normalizeUf } from "./ufs.js";
 
@@ -34,7 +35,7 @@ const DATABASE_URL = process.env.DATABASE_URL || "";
 const INGEST_TOKEN = process.env.INGEST_TOKEN || "";
 const ALERT_WHATSAPP_TO = process.env.ALERT_WHATSAPP_TO || "";
 const ALERT_EVOLUTION_INSTANCE = process.env.ALERT_EVOLUTION_INSTANCE || "";
-const SPRINT = 8;
+const SPRINT = 9;
 
 const pool = DATABASE_URL
   ? new Pool({
@@ -175,6 +176,7 @@ function mapArticle(r) {
     theme,
     uf: r.uf,
     source: r.source_name,
+    sourceId: r.source_id,
     sourceType: r.source_type,
     city: r.source_city,
   };
@@ -284,7 +286,7 @@ app.get("/api/meta", async (_req, res) => {
       pushConfigured: Boolean(getVapidPublicKey()),
       note:
         r.articles > 0
-          ? "Sprint 8: Brasil 27 UFs. Escolha o estado no app."
+          ? "Sprint 9: digest sem duplicatas Google, temas reais, páginas de 10."
           : "Fontes seedadas. Rode a coleta para popular o digest.",
     });
   } catch (err) {
@@ -746,12 +748,26 @@ app.get("/api/digest", async (req, res) => {
   const uf = normalizeUf(req.query.uf || "PE");
   const themeFilter = String(req.query.theme || "").trim().toLowerCase();
   const q = String(req.query.q || "").trim();
+  const page = Math.max(1, Number(req.query.page) || 1);
+  const pageSize = Math.min(40, Math.max(1, Number(req.query.limit) || 10));
   const todayBr = dateInBrasilia();
   const yesterdayBr = shiftDateISO(todayBr, -1);
   let date = String(req.query.date || todayBr);
   let mode = "day"; // day | yesterday-fallback | recent
   if (!pool) {
-    return res.json({ uf, date, today: todayBr, count: 0, items: [], bySource: [], note: "Sem banco" });
+    return res.json({
+      uf,
+      date,
+      today: todayBr,
+      count: 0,
+      total: 0,
+      page: 1,
+      pageSize,
+      totalPages: 1,
+      items: [],
+      bySource: [],
+      note: "Sem banco",
+    });
   }
   try {
     const filters = [];
@@ -762,6 +778,9 @@ app.get("/api/digest", async (req, res) => {
       filters.push(`LOWER(COALESCE(a.theme, 'outros')) = $${p}`);
       params.push(themeFilter);
       p += 1;
+    } else {
+      // "Tudo" = só temas selecionáveis (sem "outros")
+      filters.push(`LOWER(COALESCE(a.theme, 'outros')) <> 'outros'`);
     }
     if (q) {
       filters.push(
@@ -776,7 +795,7 @@ app.get("/api/digest", async (req, res) => {
       const dayParams = [...params, day];
       const dayIdx = dayParams.length;
       const { rows } = await pool.query(
-        `SELECT a.id, a.title, a.url, a.summary, a.published_at, a.fetched_at, a.theme, a.uf,
+        `SELECT a.id, a.source_id, a.title, a.url, a.summary, a.published_at, a.fetched_at, a.theme, a.uf,
                 s.name AS source_name, s.type AS source_type, s.city AS source_city
          FROM articles a
          LEFT JOIN sources s ON s.id = a.source_id
@@ -784,7 +803,7 @@ app.get("/api/digest", async (req, res) => {
            AND (COALESCE(a.published_at, a.fetched_at) AT TIME ZONE 'America/Sao_Paulo')::date = $${dayIdx}::date
            ${extra}
          ORDER BY COALESCE(a.published_at, a.fetched_at) DESC
-         LIMIT 150`,
+         LIMIT 400`,
         dayParams
       );
       return rows;
@@ -800,26 +819,31 @@ app.get("/api/digest", async (req, res) => {
     }
     if (!rows.length && !themeFilter && !q) {
       const recent = await pool.query(
-        `SELECT a.id, a.title, a.url, a.summary, a.published_at, a.fetched_at, a.theme, a.uf,
+        `SELECT a.id, a.source_id, a.title, a.url, a.summary, a.published_at, a.fetched_at, a.theme, a.uf,
                 s.name AS source_name, s.type AS source_type, s.city AS source_city
          FROM articles a
          LEFT JOIN sources s ON s.id = a.source_id
          WHERE COALESCE(a.uf, s.uf) = $1
            ${extra}
          ORDER BY COALESCE(a.published_at, a.fetched_at) DESC
-         LIMIT 40`,
+         LIMIT 120`,
         params
       );
       rows = recent.rows;
       mode = "recent";
     }
 
+    let items = dedupePreferOriginal(rows.map(mapArticle));
+    // Reclassificados em memória como "outros" (título limpo) também saem do "Tudo"
+    if (!themeFilter || themeFilter === "todos" || themeFilter === "all") {
+      items = items.filter((it) => (it.theme || "outros") !== "outros");
+    }
+
     const bySourceMap = new Map();
     const byThemeMap = new Map();
-    for (const r of rows) {
-      const key = r.source_name || "Sem fonte";
+    for (const mapped of items) {
+      const key = mapped.source || "Sem fonte";
       bySourceMap.set(key, (bySourceMap.get(key) || 0) + 1);
-      const mapped = mapArticle(r);
       const th = mapped.theme || "outros";
       byThemeMap.set(th, (byThemeMap.get(th) || 0) + 1);
     }
@@ -829,6 +853,12 @@ app.get("/api/digest", async (req, res) => {
     const byTheme = [...byThemeMap.entries()]
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count);
+
+    const total = items.length;
+    const totalPages = Math.max(1, Math.ceil(total / pageSize) || 1);
+    const safePage = Math.min(page, totalPages);
+    const start = (safePage - 1) * pageSize;
+    const pageItems = items.slice(start, start + pageSize);
 
     const label =
       date === todayBr ? "Hoje" : date === yesterdayBr ? "Ontem" : date;
@@ -842,10 +872,14 @@ app.get("/api/digest", async (req, res) => {
       mode,
       theme: themeFilter || null,
       q: q || null,
-      count: rows.length,
+      count: pageItems.length,
+      total,
+      page: safePage,
+      pageSize,
+      totalPages,
       bySource,
       byTheme,
-      items: rows.map(mapArticle),
+      items: pageItems,
       note:
         mode === "yesterday-fallback"
           ? "Sem matérias marcadas para hoje — mostrando ontem."

@@ -1,6 +1,6 @@
 /* Farol PWA — cache mínimo; HTML/JS sempre da rede (evita tela antiga no celular) */
 
-const CACHE = "farol-shell-v5";
+const CACHE = "farol-shell-v6";
 const SHELL = ["/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png"];
 
 self.addEventListener("install", (event) => {
