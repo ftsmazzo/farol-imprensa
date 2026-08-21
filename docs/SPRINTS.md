@@ -15,6 +15,7 @@ Ciclos **curtos** (1–2 dias cada). Cada sprint tem: objetivo, entregável, DoD
 | **3** | Digest | Painel mostra notícias do dia |
 | **4** | Temas | Filtro por tema + busca |
 | **5** | Alertas | Regras + disparo n8n (1 canal) |
+| **6** | Notify PWA | Preferências + Web Push instalável |
 
 Depois do 5 = MVP utilizável. Escala UF/Brasil só após calibrar PE.
 
@@ -103,6 +104,26 @@ Depois do 5 = MVP utilizável. Escala UF/Brasil só após calibrar PE.
 - `N8N_ALERT_WEBHOOK` — URL de produção do webhook n8n
 - `ALERT_WHATSAPP_TO` — opcional (ex.: `5581999999999`)
 - `ALERT_EVOLUTION_INSTANCE` — opcional (nome da instância Evolution)
+
+---
+
+## Sprint 6 — Preferências + Web Push (PWA)
+
+**Objetivo:** instalar o Farol no celular e receber só o que escolheu — sem WhatsApp.
+
+**Entregáveis**
+- PWA instalável (manifest + service worker)
+- Preferências: temas + personalidades/keywords + UF
+- Web Push (VAPID) por assinatura
+- Match na ingestão → push só para quem assinou
+- Onboarding no painel (“Instalar” + “Ativar alertas”)
+
+**DoD:** instalar no Android, escolher 1 tema ou 1 personalidade, receber push ao haver match.
+
+**Fora:** lojas nativas (Play/App Store), iOS full parity, login/conta.
+
+**Env**
+- `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` (mailto:…)
 
 ---
 

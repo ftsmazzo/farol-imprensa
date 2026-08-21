@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import { matchArticleAlerts, dispatchPendingAlerts } from "./alerts.js";
+import { matchArticlePush, dispatchPendingPush } from "./push.js";
 import { cleanTitle } from "./cleanTitle.js";
 import { classifyTheme } from "./themes.js";
 
@@ -91,6 +92,7 @@ export async function ingestSource(pool, source) {
     let inserted = 0;
     let skipped = 0;
     let alerts = 0;
+    let pushes = 0;
     for (const item of items) {
       const urlHash = hashUrl(item.url);
       const title = cleanTitle(item.title, source.name);
@@ -123,10 +125,20 @@ export async function ingestSource(pool, source) {
         };
         const match = await matchArticleAlerts(pool, article);
         alerts += match.matched;
+        const pushMatch = await matchArticlePush(pool, article);
+        pushes += pushMatch.matched;
       } else skipped += 1;
     }
     await pool.query(`UPDATE sources SET last_fetched_at = NOW() WHERE id = $1`, [source.id]);
-    return { sourceId: source.id, name: source.name, fetched: items.length, inserted, skipped, alerts };
+    return {
+      sourceId: source.id,
+      name: source.name,
+      fetched: items.length,
+      inserted,
+      skipped,
+      alerts,
+      pushes,
+    };
   } catch (err) {
     return {
       sourceId: source.id,
@@ -157,18 +169,24 @@ export async function runIngest(pool, { uf = "PE", limitSources = 50 } = {}) {
   let skipped = 0;
   let errors = 0;
   let alerts = 0;
+  let pushes = 0;
   for (const source of rows) {
     const r = await ingestSource(pool, source);
     results.push(r);
     inserted += r.inserted || 0;
     skipped += r.skipped || 0;
     alerts += r.alerts || 0;
+    pushes += r.pushes || 0;
     if (r.error) errors += 1;
   }
 
   let dispatch = null;
   if (alerts > 0) {
     dispatch = await dispatchPendingAlerts(pool);
+  }
+  let pushDispatch = null;
+  if (pushes > 0) {
+    pushDispatch = await dispatchPendingPush(pool);
   }
 
   return {
@@ -179,7 +197,9 @@ export async function runIngest(pool, { uf = "PE", limitSources = 50 } = {}) {
     skipped,
     errors,
     alerts,
+    pushes,
     dispatch,
+    pushDispatch,
     results,
     finishedAt: new Date().toISOString(),
   };

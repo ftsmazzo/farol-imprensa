@@ -1,5 +1,12 @@
 import { useEffect, useState, type FormEvent } from "react";
 import "./App.css";
+import {
+  getDeviceId,
+  registerServiceWorker,
+  subscribePush,
+  testPush,
+  unsubscribePush,
+} from "./pushClient";
 
 type Meta = {
   sprint?: number;
@@ -7,6 +14,7 @@ type Meta = {
   articles?: number;
   alertRules?: number;
   alertWebhookConfigured?: boolean;
+  pushConfigured?: boolean;
   lastFetchAt?: string | null;
 };
 
@@ -51,14 +59,18 @@ type Digest = {
   note?: string | null;
 };
 
-const THEME_CHIPS = [
-  "todos",
+const PREF_THEMES = [
   "política",
   "economia",
   "segurança",
   "saúde",
   "educação",
   "meio ambiente",
+];
+
+const THEME_CHIPS = [
+  "todos",
+  ...PREF_THEMES,
   "outros",
 ];
 
@@ -105,6 +117,10 @@ export default function App() {
   const [events, setEvents] = useState<AlertEvent[]>([]);
   const [ruleName, setRuleName] = useState("");
   const [ruleKeywords, setRuleKeywords] = useState("");
+  const [prefThemes, setPrefThemes] = useState<string[]>(["política"]);
+  const [prefPeople, setPrefPeople] = useState("");
+  const [pushOn, setPushOn] = useState(false);
+  const [installEvt, setInstallEvt] = useState<{ prompt: () => Promise<void> } | null>(null);
 
   const loadMeta = () => fetch("/api/meta").then((r) => r.json()).then(setMeta);
 
@@ -143,10 +159,29 @@ export default function App() {
   };
 
   useEffect(() => {
+    registerServiceWorker().catch(() => {});
+    const onbip = (e: Event) => {
+      e.preventDefault();
+      const ev = e as Event & { prompt: () => Promise<void> };
+      setInstallEvt({ prompt: () => ev.prompt() });
+    };
+    window.addEventListener("beforeinstallprompt", onbip);
     Promise.all([
       loadMeta(),
       fetch("/api/digest?uf=PE").then((r) => r.json()),
       loadAlerts(),
+      fetch(`/api/push/me?deviceId=${encodeURIComponent(getDeviceId())}`)
+        .then((r) => r.json())
+        .then((me) => {
+          if (me?.active) {
+            setPushOn(true);
+            if (Array.isArray(me.themes) && me.themes.length) setPrefThemes(me.themes);
+            if (Array.isArray(me.keywords) && me.keywords.length) {
+              setPrefPeople(me.keywords.join(", "));
+            }
+          }
+        })
+        .catch(() => {}),
     ])
       .then(async ([, base]) => {
         if (base.today && base.yesterday) {
@@ -155,6 +190,7 @@ export default function App() {
         await loadDigest("today", { base });
       })
       .catch((e) => setError(String(e)));
+    return () => window.removeEventListener("beforeinstallprompt", onbip);
   }, []);
 
   const selectDay = async (which: "today" | "yesterday") => {
@@ -277,6 +313,67 @@ export default function App() {
     }
   };
 
+  const togglePrefTheme = (t: string) => {
+    setPrefThemes((prev) =>
+      prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]
+    );
+  };
+
+  const savePushPrefs = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      const keywords = prefPeople
+        .split(/[,;|/]+/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+      await subscribePush(prefThemes, keywords, "PE");
+      setPushOn(true);
+      setFlash("Alertas no celular ativados — só o que você escolheu.");
+      await loadMeta();
+    } catch (err) {
+      setError(String(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const stopPush = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      await unsubscribePush();
+      setPushOn(false);
+      setFlash("Push desativado neste aparelho.");
+    } catch (err) {
+      setError(String(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const sendTestPush = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      const j = await testPush();
+      setFlash(`Push teste: ${j.dispatch?.status || "ok"}`);
+    } catch (err) {
+      setError(String(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const installApp = async () => {
+    if (!installEvt) {
+      setFlash("No Android/Chrome: menu ⋮ → Instalar app. No iPhone: Compartilhar → Tela de Início.");
+      return;
+    }
+    await installEvt.prompt();
+    setInstallEvt(null);
+  };
+
   const items = digest?.items || [];
   const topSources = (digest?.bySource || []).slice(0, 5);
 
@@ -308,7 +405,7 @@ export default function App() {
           </div>
           <div className="kpi">
             <span>Sprint</span>
-            <strong>{meta?.sprint ?? 5}</strong>
+            <strong>{meta?.sprint ?? 6}</strong>
           </div>
         </div>
       </header>
@@ -414,6 +511,72 @@ export default function App() {
         )}
       </section>
 
+      <section className="notify" aria-label="Instalar e alertas">
+        <div className="alerts-head">
+          <div>
+            <h2>No celular</h2>
+            <p>
+              Instale o Farol e escolha temas ou personalidades. Notificação do sistema — sem
+              WhatsApp.
+              {meta?.pushConfigured === false ? " (VAPID ainda não configurado no servidor.)" : ""}
+            </p>
+          </div>
+          <div className="actions">
+            <button type="button" className="btn ghost" onClick={installApp}>
+              {installEvt ? "Instalar app" : "Como instalar"}
+            </button>
+            {pushOn ? (
+              <>
+                <button type="button" className="btn ghost" onClick={sendTestPush} disabled={busy}>
+                  Testar push
+                </button>
+                <button type="button" className="btn ghost" onClick={stopPush} disabled={busy}>
+                  Desativar
+                </button>
+              </>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="theme-tabs" role="group" aria-label="Temas para alertar">
+          {PREF_THEMES.map((t) => (
+            <button
+              key={t}
+              type="button"
+              className={prefThemes.includes(t) ? "tab on" : "tab"}
+              onClick={() => togglePrefTheme(t)}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+
+        <form
+          className="rule-form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            savePushPrefs();
+          }}
+        >
+          <input
+            type="text"
+            placeholder="Personalidades / keywords (ex.: Raquel, Cabrobó)"
+            value={prefPeople}
+            onChange={(e) => setPrefPeople(e.target.value)}
+            aria-label="Personalidades"
+          />
+          <button type="submit" className="btn" disabled={busy || meta?.pushConfigured === false}>
+            {pushOn ? "Atualizar alertas" : "Ativar alertas"}
+          </button>
+        </form>
+        {pushOn ? (
+          <p className="notify-status">
+            Ativo · temas: {prefThemes.join(", ") || "—"}
+            {prefPeople.trim() ? ` · pessoas: ${prefPeople}` : ""}
+          </p>
+        ) : null}
+      </section>
+
       <section className="alerts" aria-label="Alertas">
         <div className="alerts-head">
           <div>
@@ -482,7 +645,7 @@ export default function App() {
       </section>
 
       <footer className="foot">
-        Farol · Sprint {meta?.sprint ?? 5} · paralelo ao Radar Imprensa
+        Farol · Sprint {meta?.sprint ?? 6} · paralelo ao Radar Imprensa
       </footer>
     </div>
   );

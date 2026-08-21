@@ -9,7 +9,7 @@ Monitoramento inteligente de notícias — produto **paralelo** ao Radar Imprens
 
 ## Sprints (MVP)
 
-Ver [docs/SPRINTS.md](docs/SPRINTS.md) — 5 sprints curtos.
+Ver [docs/SPRINTS.md](docs/SPRINTS.md) — sprints curtos.
 
 | # | Nome | Status |
 |---|------|--------|
@@ -18,6 +18,7 @@ Ver [docs/SPRINTS.md](docs/SPRINTS.md) — 5 sprints curtos.
 | 3 | Digest | feito |
 | 4 | Temas | feito |
 | 5 | Alertas | feito |
+| 6 | Notify PWA | feito |
 
 ## Produção (Easypanel)
 
@@ -26,7 +27,7 @@ Ver [docs/SPRINTS.md](docs/SPRINTS.md) — 5 sprints curtos.
 - **URL:** https://farol-imprensa-web.kxryyk.easypanel.host
 - **Repo:** https://github.com/ftsmazzo/farol-imprensa
 
-Health: `/api/health` · Meta: `/api/meta` · Digest: `/api/digest?uf=PE` · Alertas: `/api/alerts/rules`
+Health: `/api/health` · Meta: `/api/meta` · Digest: `/api/digest?uf=PE` · Push: `/api/push/vapid-public-key`
 
 ### Env alertas (Sprint 5)
 
@@ -37,6 +38,16 @@ ALERT_EVOLUTION_INSTANCE=nome-da-instancia
 ```
 
 n8n: workflow **Farol — Alertas WhatsApp** (`jekJRVnX4nv02vZX`)
+
+### Env Web Push (Sprint 6)
+
+```
+VAPID_PUBLIC_KEY=...
+VAPID_PRIVATE_KEY=...
+VAPID_SUBJECT=mailto:farol@fabria.ia
+```
+
+No celular: seção **No celular** → escolher temas/personalidades → **Ativar alertas** → **Instalar app**.
 
 ## Local (Sprint 1)
 

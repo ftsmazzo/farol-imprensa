@@ -328,6 +328,19 @@ body {
   padding: 1.15rem 1.25rem 1.35rem;
 }
 
+.notify {
+  margin-top: 1.75rem;
+  border: 1px solid rgba(240, 180, 41, 0.28);
+  background: linear-gradient(180deg, rgba(240, 180, 41, 0.08), var(--panel));
+  padding: 1.15rem 1.25rem 1.35rem;
+}
+
+.notify-status {
+  margin: 0.55rem 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
 .alerts-head {
   display: flex;
   flex-wrap: wrap;

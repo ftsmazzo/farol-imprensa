@@ -11,6 +11,14 @@ import {
   normalizeKeywords,
   N8N_ALERT_WEBHOOK,
 } from "./alerts.js";
+import {
+  dispatchPendingPush,
+  ensureVapid,
+  getVapidPublicKey,
+  matchArticlePush,
+  sendPushEvent,
+  upsertSubscriber,
+} from "./push.js";
 import { runIngest } from "./ingest.js";
 import { seedSources } from "./seed.js";
 import { THEMES, classifyTheme } from "./themes.js";
@@ -25,7 +33,7 @@ const DATABASE_URL = process.env.DATABASE_URL || "";
 const INGEST_TOKEN = process.env.INGEST_TOKEN || "";
 const ALERT_WHATSAPP_TO = process.env.ALERT_WHATSAPP_TO || "";
 const ALERT_EVOLUTION_INSTANCE = process.env.ALERT_EVOLUTION_INSTANCE || "";
-const SPRINT = 5;
+const SPRINT = 6;
 
 const pool = DATABASE_URL
   ? new Pool({
@@ -111,6 +119,34 @@ async function migrate() {
     );
     CREATE UNIQUE INDEX IF NOT EXISTS alert_events_rule_article_uidx
       ON alert_events (rule_id, article_id);
+
+    CREATE TABLE IF NOT EXISTS push_subscribers (
+      id BIGSERIAL PRIMARY KEY,
+      device_id TEXT,
+      endpoint TEXT NOT NULL UNIQUE,
+      p256dh TEXT NOT NULL,
+      auth TEXT NOT NULL,
+      uf CHAR(2) DEFAULT 'PE',
+      themes TEXT[] NOT NULL DEFAULT '{}',
+      keywords TEXT[] NOT NULL DEFAULT '{}',
+      active BOOLEAN NOT NULL DEFAULT TRUE,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS push_subscribers_active_idx ON push_subscribers (active);
+
+    CREATE TABLE IF NOT EXISTS push_events (
+      id BIGSERIAL PRIMARY KEY,
+      subscriber_id BIGINT REFERENCES push_subscribers(id) ON DELETE CASCADE,
+      article_id BIGINT REFERENCES articles(id),
+      matched_on TEXT,
+      match_kind TEXT,
+      status TEXT NOT NULL DEFAULT 'pending',
+      sent_at TIMESTAMPTZ,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE UNIQUE INDEX IF NOT EXISTS push_events_sub_article_uidx
+      ON push_events (subscriber_id, article_id);
   `);
   console.log("Migrate ok");
 }
@@ -240,9 +276,10 @@ app.get("/api/meta", async (_req, res) => {
       lastFetchAt: r.last_fetch_at,
       ingestRunning,
       alertWebhookConfigured: Boolean(N8N_ALERT_WEBHOOK),
+      pushConfigured: Boolean(getVapidPublicKey()),
       note:
         r.articles > 0
-          ? "Sprint 5: alertas ativos. Configure N8N_ALERT_WEBHOOK para disparo."
+          ? "Sprint 6: PWA + Web Push. Instale e escolha temas/personalidades."
           : "Fontes PE seedadas. Rode a coleta para popular o digest.",
     });
   } catch (err) {
@@ -515,6 +552,155 @@ app.post("/api/alerts/rematch", async (req, res) => {
   }
 });
 
+app.get("/api/push/vapid-public-key", (_req, res) => {
+  const key = getVapidPublicKey();
+  if (!key) return res.status(503).json({ error: "VAPID não configurado" });
+  res.json({ publicKey: key });
+});
+
+app.get("/api/push/me", async (req, res) => {
+  if (!pool) return res.json(null);
+  const deviceId = String(req.query.deviceId || "").trim();
+  const endpoint = String(req.query.endpoint || "").trim();
+  if (!deviceId && !endpoint) return res.status(400).json({ error: "deviceId ou endpoint" });
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, device_id, uf, themes, keywords, active, updated_at
+       FROM push_subscribers
+       WHERE active = TRUE AND (
+         ($1::text <> '' AND device_id = $1) OR ($2::text <> '' AND endpoint = $2)
+       )
+       ORDER BY updated_at DESC
+       LIMIT 1`,
+      [deviceId, endpoint]
+    );
+    if (!rows.length) return res.json(null);
+    const r = rows[0];
+    res.json({
+      id: r.id,
+      deviceId: r.device_id,
+      uf: r.uf,
+      themes: r.themes || [],
+      keywords: r.keywords || [],
+      active: r.active,
+      updatedAt: r.updated_at,
+    });
+  } catch (err) {
+    res.status(500).json({ error: String(err.message || err) });
+  }
+});
+
+app.post("/api/push/subscribe", async (req, res) => {
+  if (!pool) return res.status(503).json({ error: "DATABASE_URL não configurado" });
+  if (!getVapidPublicKey()) return res.status(503).json({ error: "VAPID não configurado" });
+  try {
+    const row = await upsertSubscriber(pool, req.body || {});
+    res.status(201).json({
+      id: row.id,
+      deviceId: row.device_id,
+      uf: row.uf,
+      themes: row.themes || [],
+      keywords: row.keywords || [],
+      active: row.active,
+    });
+  } catch (err) {
+    res.status(400).json({ error: String(err.message || err) });
+  }
+});
+
+app.post("/api/push/unsubscribe", async (req, res) => {
+  if (!pool) return res.status(503).json({ error: "DATABASE_URL não configurado" });
+  const endpoint = String(req.body?.endpoint || "").trim();
+  const deviceId = String(req.body?.deviceId || "").trim();
+  if (!endpoint && !deviceId) return res.status(400).json({ error: "endpoint ou deviceId" });
+  try {
+    await pool.query(
+      `UPDATE push_subscribers SET active = FALSE, updated_at = NOW()
+       WHERE ($1::text <> '' AND endpoint = $1) OR ($2::text <> '' AND device_id = $2)`,
+      [endpoint, deviceId]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: String(err.message || err) });
+  }
+});
+
+app.post("/api/push/test", async (req, res) => {
+  if (!pool) return res.status(503).json({ error: "DATABASE_URL não configurado" });
+  if (!ensureVapid()) return res.status(503).json({ error: "VAPID não configurado" });
+  const deviceId = String(req.body?.deviceId || "").trim();
+  const endpoint = String(req.body?.endpoint || "").trim();
+  try {
+    const subs = await pool.query(
+      `SELECT id FROM push_subscribers
+       WHERE active = TRUE AND (
+         ($1::text <> '' AND device_id = $1) OR ($2::text <> '' AND endpoint = $2)
+       )
+       ORDER BY updated_at DESC LIMIT 1`,
+      [deviceId, endpoint]
+    );
+    if (!subs.rowCount) return res.status(404).json({ error: "assinatura não encontrada" });
+
+    let articleId = req.body?.articleId ? Number(req.body.articleId) : null;
+    if (!articleId) {
+      const arts = await pool.query(
+        `SELECT id FROM articles ORDER BY fetched_at DESC LIMIT 1`
+      );
+      if (!arts.rowCount) return res.status(400).json({ error: "sem artigos" });
+      articleId = arts.rows[0].id;
+    }
+
+    const ev = await pool.query(
+      `INSERT INTO push_events (subscriber_id, article_id, matched_on, match_kind, status)
+       VALUES ($1, $2, $3, 'test', 'pending')
+       ON CONFLICT (subscriber_id, article_id) DO UPDATE
+         SET status = 'pending', matched_on = EXCLUDED.matched_on, match_kind = 'test', sent_at = NULL
+       RETURNING id`,
+      [subs.rows[0].id, articleId, String(req.body?.matchedOn || "teste")]
+    );
+    const dispatch = await sendPushEvent(pool, ev.rows[0].id);
+    res.json({ ok: true, eventId: ev.rows[0].id, articleId, dispatch });
+  } catch (err) {
+    res.status(500).json({ error: String(err.message || err) });
+  }
+});
+
+app.post("/api/push/dispatch", async (req, res) => {
+  if (!pool) return res.status(503).json({ error: "DATABASE_URL não configurado" });
+  if (!requireIngestAuth(req, res)) return;
+  try {
+    const report = await dispatchPendingPush(pool, {
+      limit: Math.min(Number(req.body?.limit) || 40, 100),
+    });
+    res.json(report);
+  } catch (err) {
+    res.status(500).json({ error: String(err.message || err) });
+  }
+});
+
+/** Rematch push: artigos recentes × assinaturas. */
+app.post("/api/push/rematch", async (req, res) => {
+  if (!pool) return res.status(503).json({ error: "DATABASE_URL não configurado" });
+  if (!requireIngestAuth(req, res)) return;
+  const limit = Math.min(Number(req.body?.limit) || 200, 500);
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, title, summary, theme, uf FROM articles
+       ORDER BY fetched_at DESC LIMIT $1`,
+      [limit]
+    );
+    let matched = 0;
+    for (const a of rows) {
+      const r = await matchArticlePush(pool, a);
+      matched += r.matched;
+    }
+    const dispatch = matched ? await dispatchPendingPush(pool) : null;
+    res.json({ ok: true, scanned: rows.length, matched, dispatch });
+  } catch (err) {
+    res.status(500).json({ error: String(err.message || err) });
+  }
+});
+
 app.get("/api/themes", (_req, res) => {
   res.json({ themes: THEMES });
 });
@@ -652,6 +838,7 @@ if (pool) {
     await seedSources(pool, root);
     await backfillArticles();
     await seedDefaultAlertRule();
+    ensureVapid();
   } catch (err) {
     console.warn("Postgres indisponível no boot:", err.message || err);
   }
